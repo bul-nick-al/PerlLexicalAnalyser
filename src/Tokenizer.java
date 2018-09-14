@@ -17,11 +17,25 @@ public class Tokenizer {
 
     public String getNextToken() {
         String nextToken = "";
+
+        if (currentSymbol == 0) {
+            //пропустить строку, если она пустая
+            if (input.get(currentLine).isEmpty()) {
+                currentLine++;
+            }
+            //пропустить пробелы в начале строки
+            while (input.get(currentLine).charAt(currentSymbol) == ' ') {
+                currentSymbol++;
+            }
+        }
+
+        //считать токен до пробела
         while (currentSymbol != input.get(currentLine).length() && input.get(currentLine).charAt(currentSymbol) != ' ') {
             nextToken += String.valueOf(input.get(currentLine).charAt(currentSymbol));
             currentSymbol++;
         }
 
+        //если символ последний, перейти на следующую строку, иначе перейти на следующий символ
         if (currentSymbol == input.get(currentLine).length()) {
             if (currentLine != input.size() - 1) {
                 currentSymbol = 0;
@@ -39,5 +53,10 @@ public class Tokenizer {
         } else {
             return false;
         }
+    }
+
+    public void commentLine() {
+        currentSymbol = 0;
+        currentLine++;
     }
 }
