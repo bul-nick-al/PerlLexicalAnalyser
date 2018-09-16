@@ -1,6 +1,25 @@
 import java.util.HashMap;
 
 public class Token {
+
+    int line;
+    int position;
+    PerlTokens type;
+    String value;
+
+
+    public Token(PerlTokens type, String value, int line, int position) {
+        this.type = type;
+        this.value = value;
+        this.line = line;
+        this.position = position;
+    }
+
+    public Token(PerlTokens type, String value) {
+        this.type = type;
+        this.value = value;
+    }
+
     public static enum PerlTokens {
         ADDITION, SUBTRACTION, MULTIPLICATION, POWER, DIVISION, INTEGER_DIVISION, DIVISIBILITY,
         GCD, LCM, NUMERIC_EQUAL, NUMERIC_NOT_EQUAL,
@@ -46,15 +65,15 @@ public class Token {
 
         QUESTION_MARK, EXCLAMATION_MARK,
 
-
-
+        VARIABLE,
+        END_OF_INPUT, ERROR // not in language, for Lexer only
     }
 
     private static HashMap<String, PerlTokens> tokenMap;
 
     public static HashMap<String, PerlTokens> getTokenMapSingleton(){
         if (tokenMap == null) {
-            tokenMap = new HashMap<>(){
+            tokenMap = new HashMap<String, PerlTokens>(){
                 {
                     put("+", PerlTokens.ADDITION);
                     put("-", PerlTokens.SUBTRACTION);
