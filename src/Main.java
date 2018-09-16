@@ -1,5 +1,3 @@
-import com.sun.javafx.fxml.expression.Expression;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,7 +14,6 @@ public class Main {
     public static Tokenizer tokenizer;
 
     public static void main(String[] args) {
-
         ArrayList<String> tokens = new ArrayList<>();
         tokenizer = new Tokenizer(readFile());
 
