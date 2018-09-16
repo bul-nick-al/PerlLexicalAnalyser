@@ -17,8 +17,11 @@ public class Main {
         ArrayList<String> tokens = new ArrayList<>();
         lexer = new Lexer(readFile());
 
-        while (!lexer.endOfInput()) {
-            Token token = lexer.getNextToken();
+        Token token = lexer.getNextToken();
+        System.out.print(token.type + " ");
+        System.out.println(token.value);
+        while (token.type != Token.PerlTokens.END_OF_INPUT) {
+            token = lexer.getNextToken();
             System.out.print(token.type + " ");
             System.out.println(token.value);
         }

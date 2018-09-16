@@ -4,12 +4,12 @@
 public class SymbolTypeRecognizer {
 
     public enum SymbolType {
-        DIGIT, CHARACTER, MATHEMATICAL_OPERATION, COMPARISON_OPERATION, APOSTROPHE, DASH, UNDEFINED
+        DIGIT, CHARACTER, ARITHMETIC_OPERATION, COMPARISON_OPERATION, APOSTROPHE, DASH, UNDEFINED
     }
 
     public SymbolType recognize(char input) {
         if (input == '+' || input == '-' || input == '*' || input == '/') {
-            return SymbolType.MATHEMATICAL_OPERATION;
+            return SymbolType.ARITHMETIC_OPERATION;
         }
 
         if (input == '>' || input == '<' || input == '=') {

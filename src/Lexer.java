@@ -24,6 +24,7 @@ public class Lexer {
 
     public Token getNextToken() {
 
+        //System.out.println(currentSymbol);
         if (endOfInput()) {
             return new Token(Token.PerlTokens.END_OF_INPUT, "", currentLine, currentSymbol);
         }
@@ -40,23 +41,28 @@ public class Lexer {
             if (input.get(currentLine).isEmpty()) {
                 currentLine++;
             }
-            //пропустить пробелы в начале строки
-            while (input.get(currentLine).charAt(currentSymbol) == ' ') {
-                currentSymbol++;
-            }
+
+        }
+
+        //пропустить пробелы
+        while (input.get(currentLine).charAt(currentSymbol) == ' ') {
+            currentSymbol++;
         }
 
         char character = input.get(currentLine).charAt(currentSymbol);
 
+        Token result;
         switch (symbolTypeRecognizer.recognize(character)) {
             case DIGIT:
                 break;
             case CHARACTER:
-                Token result = lexemeRecognizer.recognizeIdentifier(currentSymbol, input.get(currentLine));
-                currentSymbol += result.value.length() + 1;
+                result = lexemeRecognizer.recognizeIdentifier(currentSymbol, input.get(currentLine));
+                currentSymbol += result.value.length();
                 return result;
-            case MATHEMATICAL_OPERATION:
-                break;
+            case ARITHMETIC_OPERATION:
+                result = lexemeRecognizer.recognizeArithmeticOperator(currentSymbol, input.get(currentLine));
+                currentSymbol += 1;
+                return result;
             case COMPARISON_OPERATION:
                 break;
             case UNDEFINED:
@@ -67,6 +73,7 @@ public class Lexer {
     }
 
     public Boolean endOfInput() {
+
         if (currentLine >= input.size() - 1 && currentSymbol >= input.get(currentLine).length()) {
             return true;
         } else {
