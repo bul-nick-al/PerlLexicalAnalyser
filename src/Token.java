@@ -100,13 +100,13 @@ public class Token {
                     put("ge", PerlTokens.STRING_GREATER_THAN_OR_EQUAL);//done
                     put("leg", PerlTokens.STRING_THREE_WAY_COMPARATOR);//done
                     put("cmp", PerlTokens.SMART_THREE_WAY_COMPARATOR);//done
-                    put("=", PerlTokens.ASSIGNMENT);
+                    put("=", PerlTokens.ASSIGNMENT); //done
                     put("~", PerlTokens.STRING_CONCATENATION);
                     put(":=", PerlTokens.BINDING);
                     put("x", PerlTokens.STRING_REPLICATION);
                     put("~~", PerlTokens.SMART_MATCH);
-                    put("++", PerlTokens.INCREMENT);
-                    put("--", PerlTokens.DECREMENT);
+                    put("++", PerlTokens.INCREMENT);//done
+                    put("--", PerlTokens.DECREMENT);//done
                     put("..", PerlTokens.RANGE_CONSTRUCTOR);
                     put("..^", PerlTokens.RANGE_CONSTRUCTOR);
                     put("^..", PerlTokens.RANGE_CONSTRUCTOR);

@@ -49,6 +49,35 @@ public class LexemeRecognizer {
     }
 
     public Token recognizeArithmeticOperator(int currentPosition, String input) {
+        String identifier = "";
+        Token.PerlTokens lookaheadSymbolType;
+        Token.PerlTokens secondLookaheadSymbolType;
+        char character;
+        char lookahead = ' ';
+        char secondLookeahead;
+
+        character = input.charAt(currentPosition);
+        if (currentPosition + 1 < input.length()) {
+            lookahead = input.charAt(currentPosition + 1);
+            lookaheadSymbolType = tokenMap.get(String.valueOf(lookahead));
+            if (currentPosition + 2 < input.length()) {
+                secondLookeahead = input.charAt(currentPosition + 2);
+                secondLookaheadSymbolType = tokenMap.get(String.valueOf(lookahead));
+            } else {
+                secondLookaheadSymbolType = Token.PerlTokens.ERROR;
+            }
+        } else {
+            lookaheadSymbolType = Token.PerlTokens.ERROR;
+            secondLookaheadSymbolType = Token.PerlTokens.ERROR;
+        }
+
+        if (character == '-' && lookahead == '-') {
+            return new Token(Token.PerlTokens.DECREMENT, "--");
+        }
+        if (character == '+' && lookahead == '+') {
+            return new Token(Token.PerlTokens.INCREMENT, "++");
+        }
+
         return new Token(tokenMap.get(String.valueOf(input.charAt(currentPosition))), String.valueOf(input.charAt(currentPosition)));
     }
 

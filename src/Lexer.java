@@ -61,7 +61,7 @@ public class Lexer {
                 return result;
             case ARITHMETIC_OPERATION:
                 result = lexemeRecognizer.recognizeArithmeticOperator(currentSymbol, input.get(currentLine));
-                currentSymbol += 1;
+                currentSymbol += result.value.length();
                 return result;
             case COMPARISON_OPERATION:
                 result = lexemeRecognizer.recognizeComparisonOperator(currentSymbol, input.get(currentLine));
