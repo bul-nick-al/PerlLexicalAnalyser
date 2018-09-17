@@ -132,7 +132,7 @@ public class Token {
                     put("repeat", PerlTokens.REPEAT_KEYWORD);//done
                     put("return", PerlTokens.RETURN);//done
                     put("returns", PerlTokens.RETURN);//done
-                    put("-->", PerlTokens.RETURN);
+                    put("-->", PerlTokens.RETURN);//done
                     put("sub", PerlTokens.SUB_KEYWORD);//done
                     put("unless", PerlTokens.UNLESS_KEYWORD);//done
                     put("until", PerlTokens.UNTIL_KEYWORD);//done
@@ -166,8 +166,8 @@ public class Token {
                     put(":", PerlTokens.COLON);
                     put(";", PerlTokens.SEMICOLON);
                     put("=>", PerlTokens.IMPLICATION);
-                    put("==>", PerlTokens.FORWARD_FEED);
-                    put("<==", PerlTokens.BACKWARD_FEED);
+                    put("==>", PerlTokens.FORWARD_FEED);//done
+                    put("<==", PerlTokens.BACKWARD_FEED);//done
                     put(">>", PerlTokens.HYPER_OPERATOR);
                     put("::", PerlTokens.DOUBLE_COLUM);
                     put("->", PerlTokens.ARROW);

@@ -54,7 +54,7 @@ public class LexemeRecognizer {
         Token.PerlTokens secondLookaheadSymbolType;
         char character;
         char lookahead = ' ';
-        char secondLookeahead;
+        char secondLookeahead = ' ';
 
         character = input.charAt(currentPosition);
         if (currentPosition + 1 < input.length()) {
@@ -72,7 +72,11 @@ public class LexemeRecognizer {
         }
 
         if (character == '-' && lookahead == '-') {
-            return new Token(Token.PerlTokens.DECREMENT, "--");
+            if (secondLookeahead == '>') {
+                return new Token(Token.PerlTokens.RETURN, "-->");
+            } else {
+                return new Token(Token.PerlTokens.DECREMENT, "--");
+            }
         }
         if (character == '+' && lookahead == '+') {
             return new Token(Token.PerlTokens.INCREMENT, "++");
@@ -86,8 +90,8 @@ public class LexemeRecognizer {
         Token.PerlTokens lookaheadSymbolType;
         Token.PerlTokens secondLookaheadSymbolType;
         char character;
-        char lookahead;
-        char secondLookeahead;
+        char lookahead = ' ';
+        char secondLookeahead = ' ';
 
         character = input.charAt(currentPosition);
         if (currentPosition + 1 < input.length()) {
@@ -113,9 +117,15 @@ public class LexemeRecognizer {
                 return new Token(Token.PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL, ">=");
             }
             if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.LEFT_ANG_BRACKET) {
+                if (secondLookeahead == '=') {
+                    return new Token(Token.PerlTokens.BACKWARD_FEED, "<==");
+                }
                 return new Token(Token.PerlTokens.NUMERIC_LESS_THAN_OR_EQUAL, "<=");
             }
-            if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.ASSIGNMENT) {
+            if (character == '=') {
+                if (secondLookeahead == '>') {
+                    return new Token(Token.PerlTokens.FORWARD_FEED, "==>");
+                }
                 return new Token(Token.PerlTokens.NUMERIC_EQUAL, "==");
             }
         }
