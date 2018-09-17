@@ -75,31 +75,31 @@ public class Token {
         if (tokenMap == null) {
             tokenMap = new HashMap<String, PerlTokens>(){
                 {
-                    put("+", PerlTokens.ADDITION);
-                    put("-", PerlTokens.SUBTRACTION);
-                    put("*", PerlTokens.MULTIPLICATION);
+                    put("+", PerlTokens.ADDITION); //done
+                    put("-", PerlTokens.SUBTRACTION); //done
+                    put("*", PerlTokens.MULTIPLICATION); //done
                     put("**", PerlTokens.POWER);
-                    put("/", PerlTokens.DIVISION);
-                    put("div", PerlTokens.INTEGER_DIVISION);
+                    put("/", PerlTokens.DIVISION); //done
+                    put("div", PerlTokens.INTEGER_DIVISION); //done
                     put("%", PerlTokens.PERCENT_SYMBOL);
                     put("%%", PerlTokens.DIVISIBILITY);
-                    put("gcd", PerlTokens.GCD);
-                    put("lcm", PerlTokens.LCM);
-                    put("==", PerlTokens.NUMERIC_EQUAL);
+                    put("gcd", PerlTokens.GCD); //done
+                    put("lcm", PerlTokens.LCM); //done
+                    put("==", PerlTokens.NUMERIC_EQUAL); //done
                     put("!=", PerlTokens.NUMERIC_NOT_EQUAL);
-                    put("<", PerlTokens.LEFT_ANG_BRACKET);
-                    put(">", PerlTokens.RIGHT_AND_BRACKET);
-                    put("<=", PerlTokens.NUMERIC_LESS_THAN_OR_EQUAL);
-                    put(">=", PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL);
-                    put("<=>", PerlTokens.NUMERIC_THREE_WAY_COMPARATOR);
-                    put("eq", PerlTokens.STRING_EQUAL);
-                    put("ne", PerlTokens.STRING_NOT_EQUAL);
-                    put("lt", PerlTokens.STRING_LESS_THAN);
-                    put("gt", PerlTokens.STRING_GREATER_THAN);
-                    put("le", PerlTokens.STRING_LESS_THAN_OR_EQUAL);
-                    put("ge", PerlTokens.STRING_GREATER_THAN_OR_EQUAL);
-                    put("leg", PerlTokens.STRING_THREE_WAY_COMPARATOR);
-                    put("cmp", PerlTokens.SMART_THREE_WAY_COMPARATOR);
+                    put("<", PerlTokens.LEFT_ANG_BRACKET); //done
+                    put(">", PerlTokens.RIGHT_AND_BRACKET); //done
+                    put("<=", PerlTokens.NUMERIC_LESS_THAN_OR_EQUAL); //done
+                    put(">=", PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL); //done
+                    put("<=>", PerlTokens.NUMERIC_THREE_WAY_COMPARATOR); //done
+                    put("eq", PerlTokens.STRING_EQUAL); //done
+                    put("ne", PerlTokens.STRING_NOT_EQUAL);//done
+                    put("lt", PerlTokens.STRING_LESS_THAN);//done
+                    put("gt", PerlTokens.STRING_GREATER_THAN);//done
+                    put("le", PerlTokens.STRING_LESS_THAN_OR_EQUAL);//done
+                    put("ge", PerlTokens.STRING_GREATER_THAN_OR_EQUAL);//done
+                    put("leg", PerlTokens.STRING_THREE_WAY_COMPARATOR);//done
+                    put("cmp", PerlTokens.SMART_THREE_WAY_COMPARATOR);//done
                     put("=", PerlTokens.ASSIGNMENT);
                     put("~", PerlTokens.STRING_CONCATENATION);
                     put(":=", PerlTokens.BINDING);
@@ -118,43 +118,43 @@ public class Token {
                     put("@", PerlTokens.AT_SYMBOL);
                     put("$", PerlTokens.DOLLAR_SYMBOL);
                     put("&", PerlTokens.AMPERSAND_SYMBOL);
-                    put("my", PerlTokens.MY_KEYWORD);
-                    put("default", PerlTokens.DEFAULT_KEYWORD);
-                    put("else", PerlTokens.ELSE_KEYWORD);
-                    put("elseif", PerlTokens.ELSEIF_KEYWORD);
-                    put("for", PerlTokens.FOR_KEYWORD);
-                    put("get", PerlTokens.GET_KEYWORD); //?
-                    put("given", PerlTokens.GIVEN_KEYWORD); //?
-                    put("if", PerlTokens.IF_KEYWORD);
-                    put("loop", PerlTokens.LOOP_KEYWORD);
-                    put("multi", PerlTokens.MULTI_KEYWORD);
-                    put("orwith", PerlTokens.ORWITH_KEYWORD);
-                    put("repeat", PerlTokens.REPEAT_KEYWORD);
-                    put("return", PerlTokens.RETURN);
-                    put("returns", PerlTokens.RETURN);
+                    put("my", PerlTokens.MY_KEYWORD);//done
+                    put("default", PerlTokens.DEFAULT_KEYWORD);//done
+                    put("else", PerlTokens.ELSE_KEYWORD);//done
+                    put("elseif", PerlTokens.ELSEIF_KEYWORD);//done
+                    put("for", PerlTokens.FOR_KEYWORD);//done
+                    put("get", PerlTokens.GET_KEYWORD); //?//done
+                    put("given", PerlTokens.GIVEN_KEYWORD); //? //done
+                    put("if", PerlTokens.IF_KEYWORD);//done
+                    put("loop", PerlTokens.LOOP_KEYWORD);//done
+                    put("multi", PerlTokens.MULTI_KEYWORD);//done
+                    put("orwith", PerlTokens.ORWITH_KEYWORD);//done
+                    put("repeat", PerlTokens.REPEAT_KEYWORD);//done
+                    put("return", PerlTokens.RETURN);//done
+                    put("returns", PerlTokens.RETURN);//done
                     put("-->", PerlTokens.RETURN);
-                    put("sub", PerlTokens.SUB_KEYWORD);
-                    put("unless", PerlTokens.UNLESS_KEYWORD);
-                    put("until", PerlTokens.UNTIL_KEYWORD);
-                    put("when", PerlTokens.WHEN_KEYWORD);
-                    put("while", PerlTokens.WHILE_KEYWORD);
-                    put("with", PerlTokens.WITH_KEYWORD);
-                    put("without", PerlTokens.WITHOUT_KEYWORD);
-                    put("not", PerlTokens.NOT_KEYWORD);
-                    put("class", PerlTokens.CLASS_KEYWORD);
-                    put("has", PerlTokens.HAS_KEYWORD);
-                    put("is", PerlTokens.IS_KEYWORD);
-                    put("method", PerlTokens.METHOD_KEYWORD);
-                    put("self", PerlTokens.SELF_KEYWORD);
-                    put("submethod", PerlTokens.SUBMETHOD_KEYWORD);
-                    put("role", PerlTokens.ROLE_KEYWORD);
-                    put("does", PerlTokens.DOES_KEYWORD);
-                    put("CATCH", PerlTokens.CATCH_KEYWORD);
-                    put("try", PerlTokens.TRY_KEYWORD);
-                    put("use", PerlTokens.USE_KEYWORD);
-                    put("die", PerlTokens.DIE_KEYWORD);
-                    put("INIT", PerlTokens.INIT_KEYWORD);
-                    put("constant", PerlTokens.CONSTANT_KEYWORD);
+                    put("sub", PerlTokens.SUB_KEYWORD);//done
+                    put("unless", PerlTokens.UNLESS_KEYWORD);//done
+                    put("until", PerlTokens.UNTIL_KEYWORD);//done
+                    put("when", PerlTokens.WHEN_KEYWORD);//done
+                    put("while", PerlTokens.WHILE_KEYWORD);//done
+                    put("with", PerlTokens.WITH_KEYWORD);//done
+                    put("without", PerlTokens.WITHOUT_KEYWORD);//done
+                    put("not", PerlTokens.NOT_KEYWORD);//done
+                    put("class", PerlTokens.CLASS_KEYWORD);//done
+                    put("has", PerlTokens.HAS_KEYWORD);//done
+                    put("is", PerlTokens.IS_KEYWORD);//done
+                    put("method", PerlTokens.METHOD_KEYWORD);//done
+                    put("self", PerlTokens.SELF_KEYWORD);//done
+                    put("submethod", PerlTokens.SUBMETHOD_KEYWORD);//done
+                    put("role", PerlTokens.ROLE_KEYWORD);//done
+                    put("does", PerlTokens.DOES_KEYWORD);//done
+                    put("CATCH", PerlTokens.CATCH_KEYWORD);//done
+                    put("try", PerlTokens.TRY_KEYWORD);//done
+                    put("use", PerlTokens.USE_KEYWORD);//done
+                    put("die", PerlTokens.DIE_KEYWORD);//done
+                    put("INIT", PerlTokens.INIT_KEYWORD);//done
+                    put("constant", PerlTokens.CONSTANT_KEYWORD);//done
                     put("[", PerlTokens.LEFT_SQ_BRACKET);
                     put("]", PerlTokens.RIGHT_SQ_BRACKET);
                     put("(", PerlTokens.LEFT_PARENTH);
@@ -171,8 +171,8 @@ public class Token {
                     put(">>", PerlTokens.HYPER_OPERATOR);
                     put("::", PerlTokens.DOUBLE_COLUM);
                     put("->", PerlTokens.ARROW);
-                    put("True", PerlTokens.BOOLEAN);
-                    put("False", PerlTokens.BOOLEAN);
+                    put("True", PerlTokens.BOOLEAN);//done
+                    put("False", PerlTokens.BOOLEAN);//done
                     put("?", PerlTokens.QUESTION_MARK);
                     put("!", PerlTokens.EXCLAMATION_MARK);
                 }

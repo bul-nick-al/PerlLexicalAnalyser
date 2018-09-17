@@ -52,4 +52,46 @@ public class LexemeRecognizer {
         return new Token(tokenMap.get(String.valueOf(input.charAt(currentPosition))), String.valueOf(input.charAt(currentPosition)));
     }
 
+    public Token recognizeComparisonOperator(int currentPosition, String input) {
+        String identifier = "";
+        Token.PerlTokens lookaheadSymbolType;
+        Token.PerlTokens secondLookaheadSymbolType;
+        char character;
+        char lookahead;
+        char secondLookeahead;
+
+        character = input.charAt(currentPosition);
+        if (currentPosition + 1 < input.length()) {
+            lookahead = input.charAt(currentPosition + 1);
+            lookaheadSymbolType = tokenMap.get(String.valueOf(lookahead));
+            if (currentPosition + 2 < input.length()) {
+                secondLookeahead = input.charAt(currentPosition + 2);
+                secondLookaheadSymbolType = tokenMap.get(String.valueOf(lookahead));
+            } else {
+                secondLookaheadSymbolType = Token.PerlTokens.ERROR;
+            }
+        } else {
+            lookaheadSymbolType = Token.PerlTokens.ERROR;
+            secondLookaheadSymbolType = Token.PerlTokens.ERROR;
+        }
+
+
+        if (lookaheadSymbolType == Token.PerlTokens.ASSIGNMENT) {
+            if (secondLookaheadSymbolType == Token.PerlTokens.RIGHT_AND_BRACKET) {
+                return new Token(Token.PerlTokens.NUMERIC_THREE_WAY_COMPARATOR, "<=>");
+            }
+            if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.RIGHT_AND_BRACKET) {
+                return new Token(Token.PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL, ">=");
+            }
+            if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.LEFT_ANG_BRACKET) {
+                return new Token(Token.PerlTokens.NUMERIC_LESS_THAN_OR_EQUAL, "<=");
+            }
+            if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.ASSIGNMENT) {
+                return new Token(Token.PerlTokens.NUMERIC_EQUAL, "==");
+            }
+        }
+
+        return new Token(tokenMap.get(String.valueOf(input.charAt(currentPosition))), String.valueOf(input.charAt(currentPosition)));
+    }
+
 }

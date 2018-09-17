@@ -64,7 +64,9 @@ public class Lexer {
                 currentSymbol += 1;
                 return result;
             case COMPARISON_OPERATION:
-                break;
+                result = lexemeRecognizer.recognizeComparisonOperator(currentSymbol, input.get(currentLine));
+                currentSymbol += result.value.length();
+                return result;
             case UNDEFINED:
                 break;
         }
