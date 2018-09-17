@@ -5,7 +5,6 @@ import java.util.LinkedList;
  * Created by rozaliaamirova on 16.09.2018.
  */
 public class LexemeRecognizer {
-    Lexer lexer;
     HashMap<String, Token.PerlTokens> tokenMap;
     SymbolTypeRecognizer symbolTypeRecognizer;
 
@@ -85,7 +84,7 @@ public class LexemeRecognizer {
         return new Token(tokenMap.get(String.valueOf(input.charAt(currentPosition))), String.valueOf(input.charAt(currentPosition)));
     }
 
-    public Token recognizeComparisonOperator(int currentPosition, String input) {
+    public Token recognizeTokenStartingWithComparison(int currentPosition, String input) {
         String identifier = "";
         Token.PerlTokens lookaheadSymbolType;
         Token.PerlTokens secondLookaheadSymbolType;
@@ -110,13 +109,13 @@ public class LexemeRecognizer {
 
 
         if (lookaheadSymbolType == Token.PerlTokens.ASSIGNMENT) {
-            if (secondLookaheadSymbolType == Token.PerlTokens.RIGHT_AND_BRACKET) {
+            if (secondLookeahead == '>') {
                 return new Token(Token.PerlTokens.NUMERIC_THREE_WAY_COMPARATOR, "<=>");
             }
-            if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.RIGHT_AND_BRACKET) {
+            if (character == '>') {
                 return new Token(Token.PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL, ">=");
             }
-            if (tokenMap.get(String.valueOf(character)) == Token.PerlTokens.LEFT_ANG_BRACKET) {
+            if (character == '<') {
                 if (secondLookeahead == '=') {
                     return new Token(Token.PerlTokens.BACKWARD_FEED, "<==");
                 }

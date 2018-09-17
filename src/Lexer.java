@@ -1,6 +1,3 @@
-import com.sun.javafx.fxml.expression.Expression;
-
-import java.util.HashMap;
 import java.util.LinkedList;
 
 /**
@@ -52,6 +49,7 @@ public class Lexer {
         char character = input.get(currentLine).charAt(currentSymbol);
 
         Token result;
+        //В зависимости от первого символа токана распознать токен 
         switch (symbolTypeRecognizer.recognize(character)) {
             case DIGIT:
                 break;
@@ -64,7 +62,7 @@ public class Lexer {
                 currentSymbol += result.value.length();
                 return result;
             case COMPARISON_OPERATION:
-                result = lexemeRecognizer.recognizeComparisonOperator(currentSymbol, input.get(currentLine));
+                result = lexemeRecognizer.recognizeTokenStartingWithComparison(currentSymbol, input.get(currentLine));
                 currentSymbol += result.value.length();
                 return result;
             case UNDEFINED:
