@@ -19,5 +19,6 @@ my $message = Email::MIME->create(
 );
 
 # send the message
+my $x = 10.89e-120;
 use Email::Sender::Simple qw(sendmail);
 sendmail($message);
