@@ -31,19 +31,76 @@ public class Lexer {
             currentSymbol = 0;
         }
 
-        checkComment(String.valueOf(input.get(currentLine).charAt(currentSymbol)));
 
         if (currentSymbol == 0) {
             //пропустить строку, если она пустая
             if (input.get(currentLine).isEmpty()) {
                 currentLine++;
             }
-
+            else if (input.get(currentLine).matches("\\s*=begin comment(\\s.*)*")) {
+                do {
+                    currentLine++;
+                } while (!input.get(currentLine).matches("\\s*=end comment\\s*"));
+                currentLine++;
+                return getNextToken();
+            }
         }
+
+        checkComment(String.valueOf(input.get(currentLine).charAt(currentSymbol)));
+
 
         //пропустить пробелы
         while (input.get(currentLine).charAt(currentSymbol) == ' ') {
             currentSymbol++;
+        }
+
+        int endSymbol = currentSymbol + 1;
+        while (endSymbol <= input.get(currentLine).length()&&
+                PatternsRecogniser.isMatchingAnyPattern(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            endSymbol++;
+        }
+        endSymbol--;
+        if (PatternsRecogniser.isReserved(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("RESER");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
+        }
+        else if (PatternsRecogniser.isIdentifier(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("ID");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
+        }
+        else if (PatternsRecogniser.isRegex(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("REG");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
+        }
+        else if (PatternsRecogniser.isEmbeddedComment(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("EMBB");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
+        }
+        else if (PatternsRecogniser.isNumber(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("NUM");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
+        }
+        else if (PatternsRecogniser.isString(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("STR");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
+        }
+        else if (PatternsRecogniser.isSingleComment(input.get(currentLine).substring(currentSymbol, endSymbol))){
+            System.out.println("SINGCOM");
+            System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.ERROR, "", currentLine, currentSymbol);
         }
 
         char character = input.get(currentLine).charAt(currentSymbol);
@@ -74,7 +131,7 @@ public class Lexer {
 
     public Boolean endOfInput() {
 
-        if (currentLine >= input.size() - 1 && currentSymbol >= input.get(currentLine).length()) {
+        if (currentLine > input.size() - 1||currentLine >= input.size() - 1 && currentSymbol >= input.get(currentLine).length()) {
             return true;
         } else {
             return false;

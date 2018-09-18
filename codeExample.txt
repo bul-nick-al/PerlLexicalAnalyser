@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+'friend@example.com'
 use strict;
 use warnings;
 

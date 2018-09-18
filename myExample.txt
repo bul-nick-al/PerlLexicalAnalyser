@@ -1,2 +1,5 @@
-a == b
-a ==> <====
+=begin comment trg
+This is a multi line comment.
+a'kghfh4-gf-xfgx
+Comment 2
+=end comment

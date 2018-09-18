@@ -56,7 +56,7 @@ public class Token {
         BACKWARD_FEED, // <==
         HYPER_OPERATOR, // >>
         CARET, // ^
-        DOUBLE_COLUM, // ::
+        DOUBLE_COLUMN, // ::
         ARROW, //->
 
         BOOLEAN,
@@ -169,7 +169,7 @@ public class Token {
                     put("==>", PerlTokens.FORWARD_FEED);//done
                     put("<==", PerlTokens.BACKWARD_FEED);//done
                     put(">>", PerlTokens.HYPER_OPERATOR);
-                    put("::", PerlTokens.DOUBLE_COLUM);
+                    put("::", PerlTokens.DOUBLE_COLUMN);
                     put("->", PerlTokens.ARROW);
                     put("True", PerlTokens.BOOLEAN);//done
                     put("False", PerlTokens.BOOLEAN);//done
