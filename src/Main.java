@@ -23,6 +23,9 @@ public class Main {
         System.out.println(token.value);
         while (token.type != Token.PerlTokens.END_OF_INPUT) {
             token = lexer.getNextToken();
+            if (token.type == Token.PerlTokens.SMART_MATCH) {
+                System.out.println();
+            }
             System.out.print(token.type + " ");
             System.out.println(token.value);
         }
