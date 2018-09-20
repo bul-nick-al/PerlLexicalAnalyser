@@ -73,31 +73,6 @@ public class Lexer {
         return longestMatchingPosition;
     }
 
-    private int recogniseNamedRegexToken() {
-        int longestMatchingPosition = 0;
-        if (PatternsRecogniser.isNamedRegex(input.get(currentLine))) {
-            System.out.println("Hello");
-            longestMatchingPosition = input.get(currentLine).length();
-        }
-        return longestMatchingPosition;
-    }
-
-    private Token getNamedRegexToken() {
-
-        int endSymbol = currentSymbol;
-        int longestMatchingPosition = 0;
-        String currentSubstring = "";
-        int inputLine = currentLine;
-
-        currentSubstring = input.get(currentLine);
-        while (!currentSubstring.matches(".*(regex|token|rule).*\\{(.|\n|)*\\}")) {
-            currentLine++;
-            currentSubstring += input.get(currentLine);
-        }
-        currentLine++;
-        return new Token(Token.PerlTokens.REGEX, currentSubstring);
-    }
-
     private int recogniseReservedToken() {
         int endSymbol = currentSymbol ;
         int longestMatchingPosition = 0;
@@ -142,13 +117,9 @@ public class Lexer {
                 return new Token(Token.PerlTokens.NUMBER, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
 
             case WORD_CANDIDATE:
-                int namedRegexPosition = recogniseNamedRegexToken(), identifierPosition = recogniseIdentifierToken(), reservedPosition = recogniseReservedToken(), regexPosition = recogniseRegexToken();
-                int[] positions = {identifierPosition, reservedPosition, regexPosition, namedRegexPosition};
+                int identifierPosition = recogniseIdentifierToken(), reservedPosition = recogniseReservedToken(), regexPosition = recogniseRegexToken();
+                int[] positions = {identifierPosition, reservedPosition, regexPosition};
                 int longestMatchingPosition = Arrays.stream(positions).max().getAsInt();
-
-                if (longestMatchingPosition == namedRegexPosition){
-                    return getNamedRegexToken();
-                }
                 if (longestMatchingPosition == reservedPosition){
                     tempCurrent = currentSymbol;
                     currentSymbol = reservedPosition;
@@ -178,8 +149,8 @@ public class Lexer {
                 endSymbol = recogniseRegexToken();
                 tempCurrent = currentSymbol;
                 currentSymbol = endSymbol;
-                return new Token(Token.PerlTokens.REGEX, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
-                //break;
+                new Token(Token.PerlTokens.REGEX, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
+                break;
             case UNDEFINED:
                 endSymbol = recogniseReservedToken();
                 tempCurrent = currentSymbol;
