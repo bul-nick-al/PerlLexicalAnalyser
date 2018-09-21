@@ -168,7 +168,7 @@ public class Lexer {
         }
         return longestMatchingPosition;
     }
-    
+
     private int recogniseEmbeddedToken() {
         int endSymbol = currentSymbol;
         do {
@@ -202,9 +202,12 @@ public class Lexer {
                 return new Token(Token.PerlTokens.NUMBER, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
 
             case WORD_CANDIDATE:
-                int identifierPosition = recogniseIdentifierToken(), reservedPosition = recogniseReservedToken(), regexPosition = recogniseRegexToken();
-                int[] positions = {identifierPosition, reservedPosition, regexPosition};
+                int namedRegexPosition = recogniseNamedRegexToken(), identifierPosition = recogniseIdentifierToken(), reservedPosition = recogniseReservedToken(), regexPosition = recogniseRegexToken();
+                int[] positions = {identifierPosition, reservedPosition, regexPosition, namedRegexPosition};
                 int longestMatchingPosition = Arrays.stream(positions).max().getAsInt();
+                if (longestMatchingPosition == namedRegexPosition){
+                    return getNamedRegexToken();
+                }
                 if (longestMatchingPosition == reservedPosition){
                     tempCurrent = currentSymbol;
                     currentSymbol = reservedPosition;
@@ -234,8 +237,7 @@ public class Lexer {
                 endSymbol = recogniseRegexToken();
                 tempCurrent = currentSymbol;
                 currentSymbol = endSymbol;
-                new Token(Token.PerlTokens.REGEX, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
-                break;
+                return new Token(Token.PerlTokens.REGEX, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
             case UNDEFINED:
                 endSymbol = recogniseReservedToken();
                 tempCurrent = currentSymbol;
@@ -336,7 +338,7 @@ public class Lexer {
 //        char character = input.get(currentLine).charAt(currentSymbol);
 //
 //        Token result;
-        //В зависимости от первого символа токана распознать токен 
+        //В зависимости от первого символа токана распознать токен
 //        switch (symbolTypeRecognizer.recognize(character)) {
 //            case DIGIT:
 //                break;
@@ -389,4 +391,3 @@ public class Lexer {
 
 
 }
-
