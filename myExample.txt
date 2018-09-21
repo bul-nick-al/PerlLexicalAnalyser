@@ -1,52 +1,17 @@
-token nibbler {
-    :my $text = '';
-    :my $from = self.pos;
-    :my $to = $from;
-    :my @nibbles = ();
-    :my $multiline = 0;
-    { $.from = self.pos; }
-    [ <!before <stopper> >
+token termish {
+
         [
-        || <starter> <nibbler> <stopper>
-                        {
-                            push @nibbles, $¢.makestr(TEXT => $text, _from => $from, _pos => $to ) if $from != $to;
-
-                            my $n = $<nibbler>[*-1]<nibbles>;
-                            my @n = @$n;
-
-                            push @nibbles, $<starter>[*-1];
-                            push @nibbles, @n;
-                            push @nibbles, $<stopper>[*-1];
-
-                            $text = '';
-                            $to = $from = $¢.pos;
-                        }
-        || <escape>     {
-                            push @nibbles, $¢.makestr(TEXT => $text, _from => $from, _pos => $to ) if $from != $to;
-                            push @nibbles, $<escape>[*-1];
-                            $text = '';
-                            $to = $from = $¢.pos;
-                        }
-        || .
-                        {
-                            my $ch = substr(self.orig, $¢.pos-1, 1);
-                            $text ~= $ch;
-                            $to = $¢.pos;
-                            if $ch ~~ "\n" {
-                                $multiline++;
-                            }
-                        }
+        || <?{ $*QSIGIL }>
+            [
+            || <?{ $*QSIGIL eq '$' }> [ [<!before '\\'> <POST>]+! <?after <[ \] } > ) ]> > || { $<POST> = [] } ]
+            ||                          [<!before '\\'> <POST>]*! <?after <[ \] } > ) ]> >
+            || { $*VAR = 0; }
+            ]
+        || <!{ $*QSIGIL }>
+            <POST>*
         ]
-    ]*
-    {
-        push @nibbles, $¢.makestr(TEXT => $text, _from => $from, _pos => $to ) if $from != $to or !@nibbles;
-        $<nibbles> = \@nibbles;
-        $.pos = $¢.pos;
-        $<nibbler> :delete;
-        $<escape> :delete;
-        $<starter> :delete;
-        $<stopper> :delete;
-        $*LAST_NIBBLE = $¢;
-        $*LAST_NIBBLE_MULTILINE = $¢ if $multiline;
+        {
+            self.check_variable($*VAR) if $*VAR;
+            $¢.<~CAPS> = $<term><~CAPS>;
+        }
     }
-}

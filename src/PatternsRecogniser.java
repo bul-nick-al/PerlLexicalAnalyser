@@ -3,7 +3,7 @@ public class PatternsRecogniser {
         IDENTIFIER, NUMBER, REGEX, RESERVED, SINGLE_COMMENT, EMEDDED_COMMENT, STRING
     }
 
-    private static final String STRING_REGEX = "'.*[^\\\\]'|\".*[^\\\\]\"";
+    private static final String STRING_REGEX = "'(.*[^\\\\])??'|\"(.*[^\\\\])??\"";
     private static final String NUMBER_REGEX = "[+\\-]??\\d+|0b[01]+|0x\\d+|[+\\-]??\\d+(.\\d+)??([eE][+\\-]??\\d+)??";
     private static final String REGEX_REGEX = "/.*/|m/.*/|rx/.*/";
     private static final String NAMED_REGEX_REGEX = ".*regex.*\\{.*|.*token.*\\{.*|.*rule.*\\{.*";

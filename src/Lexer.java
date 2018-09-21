@@ -96,6 +96,7 @@ public class Lexer {
 //        }
         String result = getNamedRegexToken2();
         currentLine++;
+        currentSymbol = 0;
         return new Token(Token.PerlTokens.REGEX, result);
     }
 
@@ -108,7 +109,6 @@ public class Lexer {
         input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
 
         for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
-
             if (input.get(currentLine).charAt(i) == '{') {
                 result = "{";
                 result += getNamedRegexToken1(i+1);
@@ -135,26 +135,26 @@ public class Lexer {
             input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
 
             for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
-                if (input.get(currentLine).charAt(i) == '[') {
-                    while (currentLine < input.size()) {
-                        currentSubstring += input.get(currentLine).charAt(i);
-                        while (i < input.get(currentLine).length() - 1 && input.get(currentLine).charAt(i) != ']') {
-                            i++;
-                            currentSubstring += input.get(currentLine).charAt(i);
-
-                        }
-                        if (input.get(currentLine).charAt(i) == ']') {
+                if (input.get(currentLine).charAt(i) == '\'') {
+                    int j = i;
+                    String substring = "";
+                    while (j < input.get(currentLine).length()) {
+                        substring += String.valueOf(input.get(currentLine).charAt(j));
+                        if (PatternsRecogniser.isString(substring)) {
+                            i += substring.length();
+                            currentSubstring += substring;
                             break;
                         }
-                        currentLine++;
-                        i = 0;
+                        j++;
                     }
+                } else if (input.get(currentLine).charAt(i) == '\\') {
+                    i++;
                 } else if (input.get(currentLine).charAt(i) == '{') {
                     result = "{";
                     result += getNamedRegexToken1(i+1);
                     currentSubstring += result;
                     //i += 4;
-                    i += result.length();
+                    i += result.length()+1;
                 } else if (input.get(currentLine).charAt(i) == '}') {
                     currentSubstring += "}";
                     return currentSubstring;
@@ -262,6 +262,8 @@ public class Lexer {
 
     public Token getNextToken() {
 
+
+
         //System.out.println(currentSymbol);
         if (endOfInput()) {
             return new Token(Token.PerlTokens.END_OF_INPUT, "", currentLine, currentSymbol);
@@ -274,10 +276,12 @@ public class Lexer {
             //пропустить строку, если она пустая
             if (input.get(currentLine).isEmpty()) {
                 currentLine++;
+                currentSymbol = 0;
             }
             else if (input.get(currentLine).matches("\\s*=begin comment(\\s.*)*")) {
                 do {
                     currentLine++;
+
                 } while (!input.get(currentLine).matches("\\s*=end comment\\s*"));
                 currentLine++;
                 return getNextToken();
@@ -288,8 +292,10 @@ public class Lexer {
 
 
         //пропустить пробелы
+
         while (input.get(currentLine).charAt(currentSymbol) == ' ') {
             currentSymbol++;
+            checkEndOfString();
         }
         int endSymbol = 0;
 
