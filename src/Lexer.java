@@ -73,6 +73,91 @@ public class Lexer {
         return longestMatchingPosition;
     }
 
+    private int recogniseNamedRegexToken() {
+        int longestMatchingPosition = 0;
+        if (PatternsRecogniser.isNamedRegex(input.get(currentLine))) {
+            System.out.println("Hello");
+            longestMatchingPosition = input.get(currentLine).length();
+        }
+        return longestMatchingPosition;
+    }
+
+    private Token getNamedRegexToken() {
+
+        int endSymbol = currentSymbol;
+        int longestMatchingPosition = 0;
+        String currentSubstring = "";
+        int inputLine = currentLine;
+
+        currentSubstring = input.get(currentLine);
+//        while (!currentSubstring.matches(".*(regex|token|rule).*\\{(.|\n|)*\\}")) {
+//            currentLine++;
+//            currentSubstring += input.get(currentLine);
+//        }
+        String result = getNamedRegexToken2();
+        currentLine++;
+        return new Token(Token.PerlTokens.REGEX, result);
+    }
+
+    private String getNamedRegexToken2() {
+        String currentSubstring = "";
+        String result = "";
+        currentSubstring = "";
+        currentSymbol = 0;
+
+        input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
+
+        for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
+
+            if (input.get(currentLine).charAt(i) == '{') {
+                result = "{";
+                result += getNamedRegexToken1(i+1);
+                currentSubstring += result;
+                //i += 4;
+                i += result.length();
+
+            } else if (input.get(currentLine).charAt(i) == '}') {
+                currentSubstring += "}";
+                return currentSubstring;
+            } else {
+                currentSubstring += String.valueOf(input.get(currentLine).charAt(i));
+            }
+        }
+        return currentSubstring;
+    }
+
+    private String getNamedRegexToken1(int symbol) {
+        String currentSubstring = "";
+        String result = "";
+        currentSubstring = "";
+        currentSymbol = symbol;
+        while (currentLine < input.size()) {
+            input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
+
+            for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
+
+
+                if (input.get(currentLine).charAt(i) == '{') {
+                    result = "{";
+                    result += getNamedRegexToken1(i+1);
+                    currentSubstring += result;
+                    //i += 4;
+                    i += result.length();
+
+                } else if (input.get(currentLine).charAt(i) == '}') {
+                    currentSubstring += "}";
+                    return currentSubstring;
+                } else {
+                    currentSubstring += String.valueOf(input.get(currentLine).charAt(i));
+                }
+
+            }
+            currentLine++;
+            currentSymbol = 0;
+        }
+        return currentSubstring;
+    }
+
     private int recogniseReservedToken() {
         int endSymbol = currentSymbol ;
         int longestMatchingPosition = 0;

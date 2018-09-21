@@ -1,5 +1,38 @@
-=begin comment trg
-This is a multi line comment.
-a'kghfh4-gf-xfgx
-Comment 2
-=end comment
+token pblock () {
+        :temp $*CURLEX;
+        :dba('parameterized block')
+        [<?before <.lambda> | '{' > ||
+            {
+                if $*BORG and $*BORG.<block> {
+                    if $*BORG.<name> {
+                        my $m = "Function '" ~ $*BORG.<name> ~ "' needs parens to avoid gobbling block" ~ $*BORG.<culprit>.locmess;
+                        $*BORG.<block>.panic($m ~ "\nMissing block (apparently gobbled by '" ~ $*BORG.<name> ~ "')");
+                    }
+                    else {
+                        my $m = "Expression needs parens to avoid gobbling block" ~ $*BORG.<culprit>.locmess;
+                        $*BORG.<block>.panic($m ~ "\nMissing block (apparently gobbled by expression)");
+                    }
+                }
+                elsif %*MYSTERY {
+                    $¢.panic("Missing block (apparently gobbled by undeclared routine?)");
+                }
+                else {
+                    $¢.panic("Missing block");
+                }
+            }
+        ]
+        [
+        | <lambda>
+            <.newlex(1)>
+            :my $*GOAL := '{';
+            <signature(1)>
+            <blockoid>
+            <.getsig>
+        | <?before '{'>
+            <.newlex(1)>
+            <blockoid>
+            <.getsig>
+        ]
+    }
+    # this is a hook for subclasses
+    token unitstart { <?> }
