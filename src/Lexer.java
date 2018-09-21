@@ -135,22 +135,32 @@ public class Lexer {
             input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
 
             for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
+                if (input.get(currentLine).charAt(i) == '[') {
+                    while (currentLine < input.size()) {
+                        currentSubstring += input.get(currentLine).charAt(i);
+                        while (i < input.get(currentLine).length() - 1 && input.get(currentLine).charAt(i) != ']') {
+                            i++;
+                            currentSubstring += input.get(currentLine).charAt(i);
 
-
-                if (input.get(currentLine).charAt(i) == '{') {
+                        }
+                        if (input.get(currentLine).charAt(i) == ']') {
+                            break;
+                        }
+                        currentLine++;
+                        i = 0;
+                    }
+                } else if (input.get(currentLine).charAt(i) == '{') {
                     result = "{";
                     result += getNamedRegexToken1(i+1);
                     currentSubstring += result;
                     //i += 4;
                     i += result.length();
-
                 } else if (input.get(currentLine).charAt(i) == '}') {
                     currentSubstring += "}";
                     return currentSubstring;
                 } else {
-                    currentSubstring += String.valueOf(input.get(currentLine).charAt(i));
+                        currentSubstring += String.valueOf(input.get(currentLine).charAt(i));
                 }
-
             }
             currentLine++;
             currentSymbol = 0;
