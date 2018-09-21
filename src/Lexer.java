@@ -111,7 +111,7 @@ public class Lexer {
         for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
             if (input.get(currentLine).charAt(i) == '{') {
                 result = "{";
-                result += getNamedRegexToken1(i+1);
+                result += getNamedRegexToken1(i+1, '{', '}');
                 currentSubstring += result;
                 //i += 4;
                 i += result.length();
@@ -126,39 +126,71 @@ public class Lexer {
         return currentSubstring;
     }
 
-    private String getNamedRegexToken1(int symbol) {
+    private String getNamedRegexToken1(int symbol, char openedParanthesis, char closedParanthesis) {
         String currentSubstring = "";
         String result = "";
         currentSubstring = "";
         currentSymbol = symbol;
+        final char constantOpenedParanthesis = openedParanthesis;
+        final char constantClosedParanthesis = closedParanthesis;
         while (currentLine < input.size()) {
             input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
 
             for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
-                if (input.get(currentLine).charAt(i) == '\'') {
-                    int j = i;
-                    String substring = "";
-                    while (j < input.get(currentLine).length()) {
-                        substring += String.valueOf(input.get(currentLine).charAt(j));
-                        if (PatternsRecogniser.isString(substring)) {
-                            i += substring.length();
-                            currentSubstring += substring;
-                            break;
+                switch (input.get(currentLine).charAt(i)){
+                    case '\'':
+                        int j = i;
+                        String substring = "";
+                        while (j < input.get(currentLine).length()) {
+                            substring += String.valueOf(input.get(currentLine).charAt(j));
+                            if (PatternsRecogniser.isString(substring)) {
+                                i += substring.length() - 1;
+                                currentSubstring += substring;
+                                break;
+                            }
+                            j++;
                         }
-                        j++;
-                    }
-                } else if (input.get(currentLine).charAt(i) == '\\') {
-                    i++;
-                } else if (input.get(currentLine).charAt(i) == '{') {
-                    result = "{";
-                    result += getNamedRegexToken1(i+1);
-                    currentSubstring += result;
-                    //i += 4;
-                    i += result.length()+1;
-                } else if (input.get(currentLine).charAt(i) == '}') {
-                    currentSubstring += "}";
-                    return currentSubstring;
-                } else {
+                        break;
+                    case '"':
+                        j = i;
+                        substring = "";
+                        while (j < input.get(currentLine).length()) {
+                            substring += String.valueOf(input.get(currentLine).charAt(j));
+                            if (PatternsRecogniser.isString(substring)) {
+                                i += substring.length() - 1;
+                                currentSubstring += substring;
+                                break;
+                            }
+                            j++;
+                        }
+                        break;
+                    case '\\':
+                        currentSubstring += "\\";
+                        i++;
+                        currentSubstring += String.valueOf(input.get(currentLine).charAt(i));
+                        break;
+                    case '{':
+                        result = "{";
+                        result += getNamedRegexToken1(i+1, '{', '}');
+                        currentSubstring += result;
+                        i += result.length() - 1;
+                        break;
+                    case '}':
+                        if (openedParanthesis == '{') {
+                            currentSubstring += "}";
+                            return currentSubstring;
+                        }
+                        currentSubstring += "}";
+                    case '[':
+                        result = "[";
+                        result += getNamedRegexToken1(i+1, '[', ']');
+                        currentSubstring += result;
+                        i += result.length() - 1;
+                        break;
+                    case ']':
+                        currentSubstring += "]";
+                        return currentSubstring;
+                    default:
                         currentSubstring += String.valueOf(input.get(currentLine).charAt(i));
                 }
             }

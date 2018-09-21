@@ -1,17 +1,3 @@
-token termish {
-
-        [
-        || <?{ $*QSIGIL }>
-            [
-            || <?{ $*QSIGIL eq '$' }> [ [<!before '\\'> <POST>]+! <?after <[ \] } > ) ]> > || { $<POST> = [] } ]
-            ||                          [<!before '\\'> <POST>]*! <?after <[ \] } > ) ]> >
-            || { $*VAR = 0; }
-            ]
-        || <!{ $*QSIGIL }>
-            <POST>*
-        ]
-        {
-            self.check_variable($*VAR) if $*VAR;
-            $¢.<~CAPS> = $<term><~CAPS>;
-        }
+token t {
+            ['\\']
     }
