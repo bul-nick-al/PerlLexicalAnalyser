@@ -1,3 +1,6 @@
-token t {
-            ['\\']
+token colonpair {
+
+
+            [ <?before <[ [ ( < { ]>> <.panic: "Extra argument not allowed; pair already has variable argument"> ]?
+
     }

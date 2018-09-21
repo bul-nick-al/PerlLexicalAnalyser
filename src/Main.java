@@ -35,7 +35,7 @@ public class Main {
     public static LinkedList<String> readFile() {
         LinkedList<String> result = new LinkedList<>();
         try {
-            Scanner in = new Scanner(new File("myExample.txt"));
+            Scanner in = new Scanner(new File("STD.pm6.txt"));
             StringBuffer data = new StringBuffer();
             while (in.hasNext())
                 result.add(in.nextLine());

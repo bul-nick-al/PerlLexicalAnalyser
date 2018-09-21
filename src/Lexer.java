@@ -10,14 +10,12 @@ public class Lexer {
     int currentLine;
     int currentSymbol;
     SymbolTypeRecognizer symbolTypeRecognizer;
-//    LexemeRecognizer lexemeRecognizer;
 
     public Lexer(LinkedList<String> input) {
         this.input = input;
         currentLine = 0;
         currentSymbol = 0;
         symbolTypeRecognizer = new SymbolTypeRecognizer();
-//        lexemeRecognizer = new LexemeRecognizer();
     }
 
     private void checkEndOfString(){
@@ -83,39 +81,25 @@ public class Lexer {
     }
 
     private Token getNamedRegexToken() {
-
-        int endSymbol = currentSymbol;
-        int longestMatchingPosition = 0;
-        String currentSubstring = "";
-        int inputLine = currentLine;
-
-        currentSubstring = input.get(currentLine);
-//        while (!currentSubstring.matches(".*(regex|token|rule).*\\{(.|\n|)*\\}")) {
-//            currentLine++;
-//            currentSubstring += input.get(currentLine);
-//        }
-        String result = getNamedRegexToken2();
+        String result = getnamedRegexWithEmbeddedParanthesis();
         currentLine++;
         currentSymbol = 0;
         return new Token(Token.PerlTokens.REGEX, result);
     }
 
-    private String getNamedRegexToken2() {
+    //ищем тело регулярного выражения, заключенное в { }
+    private String getnamedRegexWithEmbeddedParanthesis() {
         String currentSubstring = "";
         String result = "";
         currentSubstring = "";
         currentSymbol = 0;
-
         input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
-
         for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
             if (input.get(currentLine).charAt(i) == '{') {
                 result = "{";
-                result += getNamedRegexToken1(i+1, '{', '}');
+                result += getInnerRecursionEmbeddings(i+1, '{');
                 currentSubstring += result;
-                //i += 4;
                 i += result.length();
-
             } else if (input.get(currentLine).charAt(i) == '}') {
                 currentSubstring += "}";
                 return currentSubstring;
@@ -126,17 +110,17 @@ public class Lexer {
         return currentSubstring;
     }
 
-    private String getNamedRegexToken1(int symbol, char openedParanthesis, char closedParanthesis) {
+    //разрешаем внутренние вложенные скобки : [ ] и { }. Скобки < > не совпадают в этом языке
+    private String getInnerRecursionEmbeddings(int symbol, char openedParanthesis) {
         String currentSubstring = "";
         String result = "";
         currentSubstring = "";
         currentSymbol = symbol;
-        final char constantOpenedParanthesis = openedParanthesis;
-        final char constantClosedParanthesis = closedParanthesis;
         while (currentLine < input.size()) {
             input.set(currentLine, input.get(currentLine).replaceAll("  ", ""));
 
             for (int i = currentSymbol; i < input.get(currentLine).length(); i++) {
+
                 switch (input.get(currentLine).charAt(i)){
                     case '\'':
                         int j = i;
@@ -171,7 +155,7 @@ public class Lexer {
                         break;
                     case '{':
                         result = "{";
-                        result += getNamedRegexToken1(i+1, '{', '}');
+                        result += getInnerRecursionEmbeddings(i+1, '{');
                         currentSubstring += result;
                         i += result.length() - 1;
                         break;
@@ -179,11 +163,13 @@ public class Lexer {
                         if (openedParanthesis == '{') {
                             currentSubstring += "}";
                             return currentSubstring;
+                        } else {
+                            currentSubstring += "}";
+                            break;
                         }
-                        currentSubstring += "}";
                     case '[':
                         result = "[";
-                        result += getNamedRegexToken1(i+1, '[', ']');
+                        result += getInnerRecursionEmbeddings(i+1, '[');
                         currentSubstring += result;
                         i += result.length() - 1;
                         break;
