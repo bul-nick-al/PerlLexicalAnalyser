@@ -1,7 +1,4 @@
 public class PatternsRecogniser {
-    enum Types {
-        IDENTIFIER, NUMBER, REGEX, RESERVED, SINGLE_COMMENT, EMEDDED_COMMENT, STRING
-    }
 
     private static final String STRING_REGEX = "'(.*([^\\\\]|\\\\\\\\))??'|\"(.*([^\\\\]|\\\\\\\\))??\"";
     private static final String NUMBER_REGEX = "[+\\-]??\\d+|0b[01]+|0x\\d+|[+\\-]??\\d+(.\\d+)??([eE][+\\-]??\\d+)??";
@@ -11,38 +8,28 @@ public class PatternsRecogniser {
     private static final String SINGLE_COMMENT_REGEX = "#.*";
     private static final String EMBEDDED_COMMENT_REGEX = "#`\\([^)]*\\)";
 
-    public static boolean isString(String string){
+    static boolean isString(String string){
         return string.matches(STRING_REGEX);
     }
-
-    public static boolean isNumber(String string){
+    static boolean isNumber(String string){
         return string.matches(NUMBER_REGEX);
     }
-    public static boolean isRegex(String string){
+    static boolean isRegex(String string){
         return string.matches(REGEX_REGEX);
     }
     public static boolean isSingleComment(String string){
         return string.matches(SINGLE_COMMENT_REGEX);
     }
-    public static boolean isEmbeddedComment(String string){
+    static boolean isEmbeddedComment(String string){
         return string.matches(EMBEDDED_COMMENT_REGEX);
     }
-    public static boolean isIdentifier(String string){
+    static boolean isIdentifier(String string){
         return string.matches(IDENTIFIER_REGEX);
     }
     public static boolean isReserved(String string){
         return Token.getTokenMapSingleton().containsKey(string);
     }
-    public static boolean isNamedRegex(String string){
+    static boolean isNamedRegex(String string){
         return string.matches(NAMED_REGEX_REGEX);
-    }
-
-    public static boolean isMatchingAnyPattern(String string){
-        return isNumber(string)
-                ||isIdentifier(string)
-                ||isRegex(string)
-                ||isSingleComment(string)
-                ||isEmbeddedComment(string)
-                ||isReserved(string);
     }
 }

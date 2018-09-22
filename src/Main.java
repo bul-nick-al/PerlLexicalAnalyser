@@ -1,14 +1,9 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-
-/**
- * Created by rozaliaamirova on 14.09.2018.
- */
 public class Main {
 
     public static Lexer lexer;
@@ -20,14 +15,14 @@ public class Main {
         lexer = new Lexer(readFile());
 
         Token token = lexer.getNextToken();
-        System.out.print(token.type + " ");
-        System.out.println(token.value);
-        while (token.type != Token.PerlTokens.END_OF_INPUT) {
+        System.out.print(token.getType() + " ");
+        System.out.println(token.getValue());
+        while (token.getType() != Token.PerlTokens.END_OF_INPUT) {
             token = lexer.getNextToken();
-            if (token.value.contains("token term:sym<undef>"))
+            if (token.getValue().contains("token term:sym<undef>"))
                 System.out.println("XXX");
-            System.out.print(token.type + " ");
-            System.out.println(token.value);
+            System.out.print(token.getType() + " ");
+            System.out.println(token.getValue());
         }
     }
 

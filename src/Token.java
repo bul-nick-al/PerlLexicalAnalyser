@@ -1,26 +1,41 @@
 import java.util.HashMap;
 
-public class Token {
+class Token {
 
-    int line;
-    int position;
-    PerlTokens type;
-    String value;
+    private int line;
+    private int position;
 
 
-    public Token(PerlTokens type, String value, int line, int position) {
+
+    private PerlTokens type;
+    private String value;
+
+
+    Token(PerlTokens type, String value, int line, int position) {
         this.type = type;
         this.value = value;
         this.line = line;
         this.position = position;
     }
 
-    public Token(PerlTokens type, String value) {
-        this.type = type;
-        this.value = value;
+    public PerlTokens getType() {
+        return type;
     }
 
-    public static enum PerlTokens {
+    public String getValue() {
+        return value;
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+
+    public enum PerlTokens {
         ADDITION, SUBTRACTION, MULTIPLICATION, POWER, DIVISION, INTEGER_DIVISION, DIVISIBILITY,
         GCD, LCM, NUMERIC_EQUAL, NUMERIC_NOT_EQUAL,
         NUMERIC_LESS_THAN_OR_EQUAL, NUMERIC_GREATER_THAN_OR_EQUAL, NUMERIC_THREE_WAY_COMPARATOR,
@@ -68,7 +83,6 @@ public class Token {
 
         QUESTION_MARK, EXCLAMATION_MARK,
 
-        VARIABLE,
         END_OF_INPUT, ERROR // not in language, for Lexer only
     }
 
