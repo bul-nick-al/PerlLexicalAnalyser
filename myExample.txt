@@ -1,5 +1,1 @@
-rule t {
-        [
-            # (EXPR ere clauses)
-        ] || <.panic: "Malformed subset">
-    }
+token numeric:complex { [<[+\-]>] <[+\-]> }

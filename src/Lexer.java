@@ -126,7 +126,7 @@ public class Lexer {
             if (input.get(currentLine).charAt(currentSymbol) == '>') {
                 isAnglesParethesis = false;
             }
-            if (input.get(currentLine).charAt(currentSymbol) == '{'&&!isAnglesParethesis) {
+            if (input.get(currentLine).charAt(currentSymbol) == '{' && !isAnglesParethesis) {
                 int tempLine = currentLine;
                 int tempSymbol = currentSymbol;
                 currentSymbol++;
@@ -163,7 +163,7 @@ public class Lexer {
                 int endSymbol = recogniseStringToken();
                 currentSymbol = endSymbol;
                 return;
-            case "<[":
+            //case "<[":
             case "<?[":
                 while (true) {
                     checkEndOfString();
@@ -215,12 +215,12 @@ public class Lexer {
                         getInnerRecursionEmbeddings("[");
                         currentSymbol--;
                     }
-                    if (getSubstring(currentSymbol + 2).equals("<[") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<[");
-                        currentSymbol--;
-                    }
+//                    if (getSubstring(currentSymbol + 2).equals("<[") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<[");
+//                        currentSymbol--;
+//                    }
                     if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
                         currentSymbol++;
                         currentSymbol++;
@@ -241,11 +241,24 @@ public class Lexer {
                         getInnerRecursionEmbeddings("<?(");
                         currentSymbol--;
                     }
+
                    if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<");
-                       currentSymbol--;
-                    }
+                       int j = currentSymbol;
+                       String currentSubstring = "";
+                       while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*\\]>")) {
+                           currentSubstring += input.get(currentLine).charAt(j);
+                           j++;
+                       }
+                       if (currentSubstring.matches("<.*\\[.*\\]>")) {
+                           currentSymbol += currentSubstring.length();
+                           //return;
+                       }
+//                       } else {
+//                           currentSymbol++;
+//                           getInnerRecursionEmbeddings("<");
+//                           currentSymbol--;
+//                       }
+                   }
                     currentSymbol++;
                 }
             case "[":
@@ -279,19 +292,19 @@ public class Lexer {
                         getInnerRecursionEmbeddings("[");
                         currentSymbol--;
                     }
-                    if (getSubstring(currentSymbol + 2).equals("<[") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<[");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<?[");
-                        currentSymbol--;
-                    }
+//                    if (getSubstring(currentSymbol + 2).equals("<[") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<[");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<?[");
+//                        currentSymbol--;
+//                    }
                     if (getSubstring(currentSymbol + 2).equals("<(") && isNoEscape()) {
                         currentSymbol++;
                         currentSymbol++;
@@ -305,77 +318,95 @@ public class Lexer {
                         getInnerRecursionEmbeddings("<?(");
                         currentSymbol--;
                     }
+//                    if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<");
+//                        currentSymbol--;
+//                    }
                     if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<");
-                        currentSymbol--;
+                        int j = currentSymbol;
+                        String currentSubstring = "";
+                        while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*\\]>")) {
+                            currentSubstring += input.get(currentLine).charAt(j);
+                            j++;
+                        }
+                        if (currentSubstring.matches("<.*\\[.*\\]>")) {
+                            currentSymbol += currentSubstring.length();
+                            return;
+                            //return;
+                        }
+//                       } else {
+//                           currentSymbol++;
+//                           getInnerRecursionEmbeddings("<");
+//                           currentSymbol--;
+//                       }
                     }
                     currentSymbol++;
                 }
-            case "<":
-
-                while (true) {
-                    checkEndOfString();
-                    if (getSubstring(currentSymbol + 1).equals("#") && isNoEscape()) {
-                        currentLine++;
-                        currentSymbol = 0;
-                        continue;
-                    }
-                    if (getSubstring(currentSymbol + 1).equals("'") && isNoEscape()) {
-                        getInnerRecursionEmbeddings("'");
-                        continue;
-                    }
-                    if (getSubstring(currentSymbol + 1).equals("\"") && isNoEscape()) {
-                        getInnerRecursionEmbeddings("\"");
-                        continue;
-                    }
-                    if (getSubstring(currentSymbol + 1).equals(">") && isNoEscape()) {
-                        currentSymbol++;
-                        return;
-                    }
-                    if (getSubstring(currentSymbol + 1).equals("{") && isNoEscape()) {
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("{");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 1).equals("[") && isNoEscape()) {
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("[");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 2).equals("<[") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<[");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<?[");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 2).equals("<(") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<(");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 3).equals("<?(") && isNoEscape()) {
-                        currentSymbol++;
-                        currentSymbol++;
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<?(");
-                        currentSymbol--;
-                    }
-                    if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
-                        currentSymbol++;
-                        getInnerRecursionEmbeddings("<");
-                        currentSymbol--;
-                    }
-                    currentSymbol++;
-                }
+//            case "<":
+//
+//                while (true) {
+//                    checkEndOfString();
+//                    if (getSubstring(currentSymbol + 1).equals("#") && isNoEscape()) {
+//                        currentLine++;
+//                        currentSymbol = 0;
+//                        continue;
+//                    }
+//                    if (getSubstring(currentSymbol + 1).equals("'") && isNoEscape()) {
+//                        getInnerRecursionEmbeddings("'");
+//                        continue;
+//                    }
+//                    if (getSubstring(currentSymbol + 1).equals("\"") && isNoEscape()) {
+//                        getInnerRecursionEmbeddings("\"");
+//                        continue;
+//                    }
+//                    if (getSubstring(currentSymbol + 1).equals(">") && isNoEscape()) {
+//                        currentSymbol++;
+//                        return;
+//                    }
+//                    if (getSubstring(currentSymbol + 1).equals("{") && isNoEscape()) {
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("{");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 1).equals("[") && isNoEscape()) {
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("[");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 2).equals("<[") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<[");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<?[");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 2).equals("<(") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<(");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 3).equals("<?(") && isNoEscape()) {
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<?(");
+//                        currentSymbol--;
+//                    }
+//                    if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
+//                        currentSymbol++;
+//                        getInnerRecursionEmbeddings("<");
+//                        currentSymbol--;
+//                    }
+//                    currentSymbol++;
+//                }
         }
     }
 
