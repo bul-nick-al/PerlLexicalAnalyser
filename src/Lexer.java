@@ -160,7 +160,7 @@ public class Lexer {
                         i += result.length() - 1;
                         break;
                     case '}':
-                        if (openedParanthesis == '{') {
+                        if (openedParanthesis == '{') { //чтобы игнорировать '{' заключенное в квадратные скобки
                             currentSubstring += "}";
                             return currentSubstring;
                         } else {
@@ -174,7 +174,21 @@ public class Lexer {
                         i += result.length() - 1;
                         break;
                     case ']':
-                        currentSubstring += "]";
+                        if (openedParanthesis == '[') { //чтобы игнорировать ']' заключенное в другие виды скобок
+                            currentSubstring += "]";
+                            return currentSubstring;
+                        } else {
+                            currentSubstring += "]";
+                            break;
+                        }
+                    case '(':
+                        result = "(";
+                        result += getInnerRecursionEmbeddings(i+1, '(');
+                        currentSubstring += result;
+                        i += result.length() - 1;
+                        break;
+                    case ')':
+                        currentSubstring += ")";
                         return currentSubstring;
                     default:
                         currentSubstring += String.valueOf(input.get(currentLine).charAt(i));

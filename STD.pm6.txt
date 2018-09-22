@@ -2143,39 +2143,6 @@ grammar P6 is STD {
         ]
     }
 
-    token colonpair {
-        :my $key;
-        :my $value;
-
-        ':'
-        :dba('colon pair')
-        [
-        | '!' :: [ <identifier> || <.panic: "Malformed False pair; expected identifier">]
-            [ <?before <[ [ ( < { ]>> <.panic: "Extra argument not allowed; pair already has False argument"> ]?
-            { $key = $<identifier>.Str; $value = 0; }
-        | $<num> = [\d+] <identifier> [ <?before <[ [ ( < { ]>> <.sorry("Extra argument not allowed; pair already has argument of " ~ $<num>.Str)> <.circumfix> ]?
-        | <identifier>
-            { $key = $<identifier>.Str; }
-            [
-            || <.unsp>? :dba('pair value') <coloncircumfix($key)> { $value = $<coloncircumfix>; }
-            || { $value = 1; }
-            ]
-        | :dba('signature') '(' ~ ')' <fakesignature>
-        | <coloncircumfix('')>
-            { $key = ""; $value = $<coloncircumfix>; }
-        | $<var> = (
-                <sigil> {}
-                [
-                | <twigil>? <desigilname>
-                | '<' <desigilname> '>'
-                ]
-            )
-            [ <?before <[ [ ( < { ]>> <.panic: "Extra argument not allowed; pair already has variable argument"> ]?
-            { $key = $<var><desigilname>.Str; $value = $<var>; $¢.check_variable($value); }
-        ]
-        $<k> = {$key} $<v> = {$value}
-    }
-
     # Most of these special variable rules are there simply to catch old p5 brainos
 
     token special_variable:sym<$¢> { <sym> }
@@ -2553,25 +2520,6 @@ grammar P6 is STD {
     # Quotes #
     ##########
 
-    token sibble ($l, $lang2) {
-        :my ($lang, $start, $stop);
-        <babble($l)>
-        { my $B = $<babble><B>; ($lang,$start,$stop) = @$B; }
-
-        $start <left=.nibble($lang)> [ $stop || <.panic: "Couldn't find terminator $stop"> ]
-        [ <?{ $start ne $stop }>
-            <.ws>
-            [ <?[ [ { ( < ]> <.obs('brackets around replacement', 'assignment syntax')> ]?
-            [ <infixish> || <panic: "Missing assignment operator"> ]
-            [ <?{ $<infixish>.Str eq '=' || $<infixish>.<infix_postfix_meta_operator>[0] }> || <.panic: "Malformed assignment operator"> ]
-            <.ws>
-            [ <right=EXPR(item %item_assignment)> || <.panic: "Assignment operator missing its expression"> ]
-        || 
-            { $lang = $lang2.unbalanced($stop); }
-            <right=.nibble($lang)> $stop || <.panic: "Malformed replacement part; couldn't find final $stop">
-        ]
-    }
-
     token tribble ($l, $lang2 = $l) {
         :my ($lang, $start, $stop);
         :my $*CCSTATE = '';
@@ -2717,7 +2665,7 @@ grammar P6 is STD {
     }
 
     token old_tr_mods {
-        (< c d s ] >+) 
+        (< c d s ] >+)
         {
             given $0.Str {
                 $_ ~~ /c/ and $¢.worryobs('/c',':c');
