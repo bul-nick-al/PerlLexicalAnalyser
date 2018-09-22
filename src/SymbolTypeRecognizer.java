@@ -12,7 +12,7 @@ public class SymbolTypeRecognizer {
             return SymbolType.STRING_CANDIDATE;
         if (String.valueOf(input).matches("\\d"))
             return SymbolType.NUMBER_CANDIDATE;
-        if (String.valueOf(input).matches("[A-Za-z]"))
+        if (String.valueOf(input).matches("[A-Za-z]|_"))
             return SymbolType.WORD_CANDIDATE;
         if (input == '#')
             return SymbolType.COMMENT_CANDIDATE;

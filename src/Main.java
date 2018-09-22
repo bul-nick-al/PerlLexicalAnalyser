@@ -16,6 +16,7 @@ public class Main {
     public static void main(String[] args) {
 
         LinkedList<String> tokens = readFile();
+
         lexer = new Lexer(readFile());
 
         Token token = lexer.getNextToken();
@@ -23,6 +24,8 @@ public class Main {
         System.out.println(token.value);
         while (token.type != Token.PerlTokens.END_OF_INPUT) {
             token = lexer.getNextToken();
+            if (token.value.contains("token term:sym<undef>"))
+                System.out.println("XXX");
             System.out.print(token.type + " ");
             System.out.println(token.value);
         }

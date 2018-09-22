@@ -33,6 +33,8 @@ public class Token {
 
         VERTICAL_BAR,
 
+        BACKSLASH, DOLLAR_SLASH,
+
         PERCENT_SYMBOL, AT_SYMBOL, DOLLAR_SYMBOL, AMPERSAND_SYMBOL, IDENTIFIER, STRING, NUMBER,
 
         REVERSED_OPERATOR, // R + any operator
@@ -176,6 +178,8 @@ public class Token {
                     put("False", PerlTokens.BOOLEAN);//done
                     put("?", PerlTokens.QUESTION_MARK);
                     put("!", PerlTokens.EXCLAMATION_MARK);
+                    put("\\", PerlTokens.BACKSLASH);
+                    put("$/", PerlTokens.DOLLAR_SLASH);
                 }
             };
 
