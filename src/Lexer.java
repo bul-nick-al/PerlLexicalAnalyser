@@ -204,6 +204,8 @@ public class Lexer {
                         getInnerRecursionEmbeddings("[");
                         currentSymbol--;
                     }
+
+                    //убрать?
                     if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
                         currentSymbol+=3;
                         getInnerRecursionEmbeddings("<?[");
@@ -385,6 +387,7 @@ public class Lexer {
         checkEndOfString();
         if (currentSymbol == 0) {
             //пропустить строку, если она пустая
+
             if (input.get(currentLine).isEmpty()) {
                 currentLine++;
                 currentSymbol = 0;

@@ -1,37 +1,44 @@
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.File;
 import java.util.LinkedList;
+import java.util.Scanner;
+
 import static org.junit.Assert.*;
 
 /**
  * Created by rozaliaamirova on 22.09.2018.
  */
 public class LexerTest {
-    private LinkedList<String> singlelineTest;
-    private LinkedList<String> multilineTest;
     private Lexer lexerMultiline;
     private Lexer lexerSingleline;
-    HashMap<String, Token.PerlTokens> tokenTypes;
-
 
     private void initTests() {
-        singlelineTest = new LinkedList<String>();
-        ArrayList<String> examples = new ArrayList<String>();
+        LinkedList<String> singlelineTest = new LinkedList<>();
         singlelineTest.add("try to use magic for writing perl lexer! <8");
 
-        multilineTest = new LinkedList<String>();
+        LinkedList<String> multilineTest = new LinkedList<>();
 
         multilineTest.add("lexer");
         multilineTest.add("!");
         multilineTest.add("<");
         multilineTest.add("8");
-
+        multilineTest.add("# comment test");
+        multilineTest.add("=begin comment");
+        multilineTest.add("test comment");
+        multilineTest.add("=end comment");
+        multilineTest.add("token { <[ abc ]> }");
+        multilineTest.add("token test { [ abc ] }");
+        multilineTest.add("/a..z/");
+        multilineTest.add("token testToken { [< <( #test [ [ ] ] [ <?( )> ] 'abc' \"abc\" )> >] }");
+        multilineTest.add("token testToken { <( )> }");
+        multilineTest.add("token testToken { <?( )> }");
+        multilineTest.add("token testToken { [ \" abc \" ] }");
+        multilineTest.add("token testToken { [ ' abc ' ] }");
+        multilineTest.add("token testToken { [ { abc } ] }");
         lexerMultiline = new Lexer(multilineTest);
         lexerSingleline = new Lexer(singlelineTest);
-        tokenTypes = Token.getTokenMapSingleton();
     }
 
     @Test
@@ -88,5 +95,55 @@ public class LexerTest {
         assertEquals("8", testToken8.getValue());
         assertEquals(3, testToken8.getLine());
         assertEquals(0, testToken8.getPosition());
+
+        Token testToken9 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken9.getType());
+        assertEquals("token { <[ abc ]> }", testToken9.getValue());
+        assertEquals(9, testToken9.getLine());
+        assertEquals(0, testToken9.getPosition());
+
+        Token testToken10 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken10.getType());
+        assertEquals("token test { [ abc ] }", testToken10.getValue());
+        assertEquals(10, testToken10.getLine());
+        assertEquals(0, testToken10.getPosition());
+
+        Token testToken11 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken11.getType());
+        assertEquals("/a..z/", testToken11.getValue());
+        assertEquals(10, testToken11.getLine());
+        assertEquals(0, testToken11.getPosition());
+
+        Token testToken12 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken12.getType());
+        assertEquals("token testToken { [< <( #test [ [ ] ] [ <?( )> ] 'abc' \"abc\" )> >] }", testToken12.getValue());
+        assertEquals(12, testToken12.getLine());
+        assertEquals(0, testToken12.getPosition());
+
+        Token testToken13 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken13.getType());
+        assertEquals("token testToken { <( )> }", testToken13.getValue());
+        assertEquals(13, testToken13.getLine());
+        assertEquals(0, testToken13.getPosition());
+
+        Token testToken14 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken14.getType());
+        assertEquals("token testToken { <?( )> }", testToken14.getValue());
+
+
+        Token testToken15 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken15.getType());
+        assertEquals("token testToken { [ \" abc \" ] }", testToken15.getValue());
+
+        Token testToken16 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken16.getType());
+        assertEquals("token testToken { [ ' abc ' ] }", testToken16.getValue());
+
+        Token testToken17 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken17.getType());
+        assertEquals("token testToken { [ { abc } ] }", testToken17.getValue());
+
     }
+
+
 }

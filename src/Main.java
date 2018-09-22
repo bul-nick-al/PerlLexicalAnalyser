@@ -9,18 +9,12 @@ public class Main {
     public static Lexer lexer;
 
     public static void main(String[] args) {
-
-        LinkedList<String> tokens = readFile();
-
         lexer = new Lexer(readFile());
-
         Token token = lexer.getNextToken();
         System.out.print(token.getType() + " ");
         System.out.println(token.getValue());
         while (token.getType() != Token.PerlTokens.END_OF_INPUT) {
             token = lexer.getNextToken();
-            if (token.getValue().contains("token term:sym<undef>"))
-                System.out.println("XXX");
             System.out.print(token.getType() + " ");
             System.out.println(token.getValue());
         }
@@ -33,7 +27,7 @@ public class Main {
     public static LinkedList<String> readFile() {
         LinkedList<String> result = new LinkedList<>();
         try {
-            Scanner in = new Scanner(new File("STD.pm6.txt"));
+            Scanner in = new Scanner(new File("myExample.txt"));
             StringBuffer data = new StringBuffer();
             while (in.hasNext())
                 result.add(in.nextLine());
