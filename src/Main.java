@@ -17,10 +17,10 @@ public class Main {
         String output = "";
         Lexer lexer = new Lexer(readFile());
         Token token = lexer.getNextToken();
-        output += token.getType() + token.getValue();
+        output += token.getType()  + " " + token.getValue() + '\n';
         while (token.getType() != Token.PerlTokens.END_OF_INPUT&&token.getType() != Token.PerlTokens.ERROR) {
             token = lexer.getNextToken();
-            output += token.getType() + token.getValue();
+            output += token.getType() + " " + token.getValue() + '\n';
         }
         writeFile(output);
     }
