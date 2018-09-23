@@ -5,7 +5,7 @@
 #### Description.
 
 
-This document provides a general description of the tokens the lexer may use. Since it was not specified in task, for which version of Perl we have to implement the lexer, we have chosen Perl6. And since Perl6 is on development and its structure and format are constantly under discussion, it is possible that tokens may vary significantly. The source we have chosen for the reference can be found [here](https://perl6intro.com)
+This document provides a general description of the tokens the lexer may use. Since it was not specified in the task, for which version of Perl we have to implement the lexer, we have chosen Perl6. And since Perl6 is in development and its structure and format are constantly under discussion, it is possible that tokens may vary significantly. The source we have chosen for the reference can be found [here](https://perl6intro.com)
 
 #### Tokens. 
 

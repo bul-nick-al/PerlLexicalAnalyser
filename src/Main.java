@@ -18,7 +18,7 @@ public class Main {
         Token token = lexer.getNextToken();
         System.out.print(token.getType() + " ");
         System.out.println(token.getValue());
-        while (token.getType() != Token.PerlTokens.END_OF_INPUT) {
+        while (token.getType() != Token.PerlTokens.END_OF_INPUT&&token.getType() != Token.PerlTokens.ERROR) {
             token = lexer.getNextToken();
             System.out.print(token.getType() + " ");
             System.out.println(token.getValue());
@@ -26,10 +26,10 @@ public class Main {
     }
 
     /**
-     * Method for writing string from input.txt
-     * @return
+     * Method for reading string from input.txt
+     * @return linked list of strings
      */
-    public static LinkedList<String> readFile() {
+     static LinkedList<String> readFile() {
         LinkedList<String> result = new LinkedList<>();
         try {
             Scanner in = new Scanner(new File("STD.pm6.txt"));
@@ -42,10 +42,9 @@ public class Main {
     }
 
     /**
-     * Method for reading output to output.txt
-     * @param output
+     * Method for writing output to output.txt
      */
-    public static void writeFile(String output) {
+     static void writeFile(String output) {
         try (final FileWriter writer = new FileWriter("out.txt", false)) {
             writer.write(output);
         }

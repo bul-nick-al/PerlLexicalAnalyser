@@ -9,13 +9,11 @@ public class Lexer {
     private LinkedList<String> input;
     private int currentLine;
     private int currentSymbol;
-    SymbolTypeRecognizer symbolTypeRecognizer;
 
     public Lexer(LinkedList<String> input) {
         this.input = input;
         currentLine = 0;
         currentSymbol = 0;
-        symbolTypeRecognizer = new SymbolTypeRecognizer();
     }
 
     /**
@@ -59,7 +57,7 @@ public class Lexer {
 
     /**
      * creates a token for a word candidate
-     * @return
+     * @return a token for a word candidate
      */
     private Token tokeniseWordCandidate(){
         //if it is a word candidate, there are four options for what it can be. We find the longest matching
@@ -94,7 +92,7 @@ public class Lexer {
     }
     /**
      * creates a token for a number candidate
-     * @return
+     * @return a token for a number candidate
      */
     private Token tokeniseNumberCandidate(){
         int endSymbol;
@@ -107,7 +105,7 @@ public class Lexer {
     }
     /**
      * creates a token for a string candidate
-     * @return
+     * @return a token for a string candidate
      */
     private Token tokeniseStringCandidate(){
         int endSymbol;
@@ -123,7 +121,7 @@ public class Lexer {
     }
     /**
      * creates a token for a comment candidate
-     * @return
+     * @return a token for a comment candidate
      */
     private Token tokeniseCommentCandidate(){
         int commentPosition = recogniseEmbeddedToken();
@@ -132,7 +130,7 @@ public class Lexer {
     }
     /**
      * creates a token for a regex candidate
-     * @return
+     * @return a token for a regex candidate
      */
     private Token tokeniseRegexCandidate(){
         int endSymbol;
@@ -144,7 +142,7 @@ public class Lexer {
     }
     /**
      * creates a token for a reserved word candidate
-     * @return
+     * @return a token for a reserved word candidate
      */
     private Token tokeniseReservedCandidate(){
         int endSymbol;
@@ -220,6 +218,7 @@ public class Lexer {
         }
         return longestMatchingPosition;
     }
+
     /**
      * finds longest possible regex relative to the current position
      * @return the position of the end of the number
@@ -233,38 +232,75 @@ public class Lexer {
     }
 
     /**
-     * finds longest possible regex relative to the current position
-     * @return the position of the end of the number
+     * finds longest possible reserved word relative to the current position
+     * @return the position of the reserved word
+     */
+    private int recogniseReservedToken() {
+        int endSymbol = currentSymbol;
+        int longestMatchingPosition = 0;
+        while (endSymbol < input.get(currentLine).length()) {
+            if (Token.getTokenMapSingleton().containsKey(getSubstring(currentSymbol, endSymbol + 1)))
+                longestMatchingPosition = endSymbol + 1;
+            endSymbol++;
+        }
+        return longestMatchingPosition;
+    }
+
+    /**
+     * finds longest possible embedded token relative to the current position
+     * @return the position of the embedded token
+     */
+    private int recogniseEmbeddedToken() {
+        int endSymbol = currentSymbol;
+        do {
+            endSymbol++;
+        }
+        while (endSymbol < input.get(currentLine).length()
+                && !PatternsRecogniser.isEmbeddedComment(getSubstring(currentSymbol, endSymbol)));
+
+        if (endSymbol == input.get(currentLine).length()
+                && !PatternsRecogniser.isEmbeddedComment(getSubstring(currentSymbol, endSymbol))) {
+            return -1;
+        }
+        return endSymbol;
+    }
+
+
+    /**
+     * finds longest possible named regex relative to the current position
+     * @return named regex token
      */
     private Token getNamedRegexToken() {
-        String result = getNamedRegexWithEmbeddedParanthesis();
+        String result = getNamedRegexWithEmbeddedParenthesis();
         currentLine++;
         currentSymbol = 0;
         return new Token(Token.PerlTokens.REGEX, result, currentLine, currentSymbol);
     }
 
-    private String getNamedRegexWithEmbeddedParanthesis() {
-        boolean isAnglesParenthesis = false;
+    /**
+     * finds longest possible named regex relative to the current position
+     * @return the position of the end of the number
+     */
+    private String getNamedRegexWithEmbeddedParenthesis() {
+        boolean isAngleParenthesis = false;
         String currentSubstring;
         currentSubstring = "";
         while (true) {
             checkEndOfString();
-            if (getCharacter(currentSymbol) == '<') {
-                isAnglesParenthesis = true;
-            }
-            if (getCharacter(currentSymbol) == '>') {
-                isAnglesParenthesis = false;
-            }
-            if (getCharacter(currentSymbol) == '{' && !isAnglesParenthesis) {
+            //all the manipulation below are related to regex specifics in Perl6
+            if (getCharacter(currentSymbol) == '<')
+                isAngleParenthesis = true;
+            if (getCharacter(currentSymbol) == '>')
+                isAngleParenthesis = false;
+            if (getCharacter(currentSymbol) == '{' && !isAngleParenthesis) {
                 int tempLine = currentLine;
                 int tempSymbol = currentSymbol;
                 currentSymbol++;
-                getInnerRecursionEmbeddings("{");
+                findInnerEmbeddings("{");
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append(input.get(tempLine).substring(tempSymbol, input.get(tempLine).length()));
-                for (int i = tempLine + 1; i < currentLine; i++) {
+                stringBuilder.append(input.get(tempLine).substring(tempSymbol));
+                for (int i = tempLine + 1; i < currentLine; i++)
                     stringBuilder.append(input.get(i));
-                }
                 if (tempLine < currentLine)
                     stringBuilder.append(getSubstring(0, currentSymbol));
                 return currentSubstring + stringBuilder.toString();
@@ -275,31 +311,16 @@ public class Lexer {
         }
     }
 
-    private boolean isNoEscape() {
-        int number_of_slashes = 0;
-        int i = 0;
-        while (getSubstring(currentSymbol - 1 - i, currentSymbol - i).equals("\\")) {
-            number_of_slashes++;
-            i++;
-        }
-        return number_of_slashes % 2 == 0;
-    }
-
-    private void getInnerRecursionEmbeddings(String openedParenthesis) {
+    /**
+     * adjusts currentSymbol and currentLine to the end of embedded regex.
+     * @param openedParenthesis contains the opening sybmol
+     */
+    private void findInnerEmbeddings(String openedParenthesis) {
         switch (openedParenthesis) {
             case "'":
             case "\"":
                 currentSymbol = recogniseStringToken();
                 return;
-            case "<?[":
-                while (true) {
-                    checkEndOfString();
-                    if (getSubstring(currentSymbol + 2).equals("]>") && isNoEscape()) {
-                        currentSymbol+=2;
-                        return;
-                    }
-                    currentSymbol++;
-                }
             case "<(":
             case "<?(":
                 while (true) {
@@ -319,11 +340,11 @@ public class Lexer {
                         continue;
                     }
                     if (getSubstring(currentSymbol + 1).equals("'") && isNoEscape()) {
-                        getInnerRecursionEmbeddings("'");
+                        findInnerEmbeddings("'");
                         continue;
                     }
                     if (getSubstring(currentSymbol + 1).equals("\"") && isNoEscape()) {
-                        getInnerRecursionEmbeddings("\"");
+                        findInnerEmbeddings("\"");
                         continue;
                     }
                     if (getSubstring(currentSymbol + 1).equals("}") && isNoEscape()) {
@@ -332,34 +353,34 @@ public class Lexer {
                     }
                     if (getSubstring(currentSymbol + 1).equals("{") && isNoEscape()) {
                         currentSymbol++;
-                        getInnerRecursionEmbeddings("{");
+                        findInnerEmbeddings("{");
                         currentSymbol--;
                     }
                     if (getSubstring(currentSymbol + 1).equals("[") && isNoEscape()) {
                         currentSymbol++;
-                        getInnerRecursionEmbeddings("[");
+                        findInnerEmbeddings("[");
                         currentSymbol--;
                     }
 
                     if (getSubstring(currentSymbol + 2).equals("<(") && isNoEscape()) {
                         currentSymbol+=2;
-                        getInnerRecursionEmbeddings("<(");
+                        findInnerEmbeddings("<(");
                         currentSymbol--;
                     }
                     if (getSubstring(currentSymbol + 3).equals("<?(") && isNoEscape()) {
                         currentSymbol+=3;
-                        getInnerRecursionEmbeddings("<?(");
+                        findInnerEmbeddings("<?(");
                         currentSymbol--;
                     }
 
                     if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
                         int j = currentSymbol;
                         String currentSubstring = "";
-                        while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*\\]>")) {
+                        while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*]>")) {
                             currentSubstring += getCharacter(j);
                             j++;
                         }
-                        if (currentSubstring.matches("<.*\\[.*\\]>")) {
+                        if (currentSubstring.matches("<.*\\[.*]>")) {
                             currentSymbol += currentSubstring.length();
 
                         }
@@ -375,11 +396,11 @@ public class Lexer {
                         continue;
                     }
                     if (getSubstring(currentSymbol + 1).equals("'") && isNoEscape()) {
-                        getInnerRecursionEmbeddings("'");
+                        findInnerEmbeddings("'");
                         continue;
                     }
                     if (getSubstring(currentSymbol + 1).equals("\"") && isNoEscape()) {
-                        getInnerRecursionEmbeddings("\"");
+                        findInnerEmbeddings("\"");
                         continue;
                     }
                     if (getSubstring(currentSymbol + 1).equals("]") && isNoEscape()) {
@@ -388,32 +409,32 @@ public class Lexer {
                     }
                     if (getSubstring(currentSymbol + 1).equals("{") && isNoEscape()) {
                         currentSymbol++;
-                        getInnerRecursionEmbeddings("{");
+                        findInnerEmbeddings("{");
                         currentSymbol--;
                     }
                     if (getSubstring(currentSymbol + 1).equals("[") && isNoEscape()) {
                         currentSymbol++;
-                        getInnerRecursionEmbeddings("[");
+                        findInnerEmbeddings("[");
                         currentSymbol--;
                     }
                     if (getSubstring(currentSymbol + 2).equals("<(") && isNoEscape()) {
                         currentSymbol+=2;
-                        getInnerRecursionEmbeddings("<(");
+                        findInnerEmbeddings("<(");
                         currentSymbol--;
                     }
                     if (getSubstring(currentSymbol + 3).equals("<?(") && isNoEscape()) {
                         currentSymbol+=3;
-                        getInnerRecursionEmbeddings("<?(");
+                        findInnerEmbeddings("<?(");
                         currentSymbol--;
                     }
                     if (getSubstring(currentSymbol + 1).equals("<") && isNoEscape()) {
                         int j = currentSymbol;
                         String currentSubstring = "";
-                        while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*\\]>")) {
+                        while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*]>")) {
                             currentSubstring += getCharacter(j);
                             j++;
                         }
-                        if (currentSubstring.matches("<.*\\[.*\\]>")) {
+                        if (currentSubstring.matches("<.*\\[.*]>")) {
                             currentSymbol += currentSubstring.length();
                             return;
                         }
@@ -423,31 +444,22 @@ public class Lexer {
         }
     }
 
-    private int recogniseReservedToken() {
-        int endSymbol = currentSymbol;
-        int longestMatchingPosition = 0;
-        while (endSymbol < input.get(currentLine).length()) {
-            if (Token.getTokenMapSingleton().containsKey(getSubstring(currentSymbol, endSymbol + 1)))
-                longestMatchingPosition = endSymbol + 1;
-            endSymbol++;
+
+    /* ********************* These are some auxiliary methods used for tokenisation ***********************************/
+
+    /**
+     * ensures that there is no escape symbol before some symbol
+     * @return true if there is no escape symbol before some symbol, false otherwise
+     */
+    private boolean isNoEscape() {
+        int number_of_slashes = 0;
+        int i = 0;
+        while (getSubstring(currentSymbol - 1 - i, currentSymbol - i).equals("\\")) {
+            number_of_slashes++;
+            i++;
         }
-        return longestMatchingPosition;
+        return number_of_slashes % 2 == 0;
     }
-
-    private int recogniseEmbeddedToken() {
-        int endSymbol = currentSymbol;
-        do {
-            endSymbol++;
-        }
-        while (endSymbol < input.get(currentLine).length() && !PatternsRecogniser.isEmbeddedComment(getSubstring(currentSymbol, endSymbol)));
-
-        if (endSymbol == input.get(currentLine).length() && !PatternsRecogniser.isEmbeddedComment(getSubstring(currentSymbol, endSymbol))) {
-            return -1;
-        }
-        return endSymbol;
-    }
-
-    /***********************These are some auxiliary methods used for tokenisation***********************************/
 
     /**
      * Checks if there are empty lines or spaces, and if yes, skips them.
@@ -491,7 +503,7 @@ public class Lexer {
     }
 
     /**
-     * @param endSymbol
+     * @param endSymbol the position of the last symbol + 1
      * @return the substring of the string at current line in rage from the current symbol till endSymbol
      */
     private String getSubstring(int endSymbol) {
@@ -503,9 +515,8 @@ public class Lexer {
     }
 
     /**
-     *
-     * @param startSymbol
-     * @param endSymbol
+     * @param startSymbol the position of the first symbol
+     * @param endSymbol the position of the last symbol + 1
      * @return the substring of the string at current line in rage from startSymbol till endSymbol
      */
     private String getSubstring(int startSymbol, int endSymbol) {
@@ -521,8 +532,8 @@ public class Lexer {
     }
 
     /**
-     * check if there are no more literal for tokenisation
-     * @return
+     * check if there are no more literals for tokenisation
+     * @return true if there are no more literals for tokenisation, false otherwise
      */
     private boolean endOfInput() {
         return currentLine > input.size() - 1 
