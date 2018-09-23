@@ -61,39 +61,17 @@ class Token {
      * Enum describes all types of tokens in the Perl6 language
      */
     enum PerlTokens {
-        ADDITION, SUBTRACTION, MULTIPLICATION, POWER, DIVISION, INTEGER_DIVISION, DIVISIBILITY,
-        GCD, LCM, NUMERIC_EQUAL, NUMERIC_NOT_EQUAL,
-        NUMERIC_LESS_THAN_OR_EQUAL, NUMERIC_GREATER_THAN_OR_EQUAL, NUMERIC_THREE_WAY_COMPARATOR,
-        STRING_EQUAL, STRING_NOT_EQUAL, STRING_LESS_THAN, STRING_GREATER_THAN,
-        STRING_LESS_THAN_OR_EQUAL, STRING_GREATER_THAN_OR_EQUAL, STRING_THREE_WAY_COMPARATOR,
-        SMART_THREE_WAY_COMPARATOR, ASSIGNMENT, BINDING, STRING_CONCATENATION, STRING_REPLICATION, SMART_MATCH,
-        INCREMENT, DECREMENT,
-
-        RANGE_CONSTRUCTOR, LAZY_LIST_CONSTRUCTOR,
-
-        VERTICAL_BAR,
-
-        BACKSLASH, DOLLAR_SLASH,
-
-        PERCENT_SYMBOL, AT_SYMBOL, DOLLAR_SYMBOL, AMPERSAND_SYMBOL, IDENTIFIER, STRING, NUMBER,
-
+        //these are the standard Perl6 operators that can be unambiguously identified
+        ADDITION_OPERATOR, SUBTRACTION_OPERATOR, MULTIPLICATION_OPERATOR, POWER_OPERATOR, DIVISION_OPERATOR,
+        INTEGER_DIVISION_OPERATOR, DIVISIBILITY_OPERATOR, GCD_OPERATOR, LCM_OPERATOR, NUMERIC_EQUAL_OPERATOR,
+        NUMERIC_NOT_EQUAL_OPERATOR, NUMERIC_LESS_THAN_OR_EQUAL_OPERATOR, NUMERIC_GREATER_THAN_OR_EQUAL_OPERATOR,
+        NUMERIC_THREE_WAY_COMPARATOR_OPERATOR, STRING_EQUAL_OPERATOR, STRING_NOT_EQUAL_OPERATOR,
+        STRING_LESS_THAN_OPERATOR, STRING_GREATER_THAN_OPERATOR, STRING_LESS_THAN_OR_EQUAL_OPERATOR,
+        STRING_GREATER_THAN_OR_EQUAL_OPERATOR, STRING_THREE_WAY_COMPARATOR_OPERATOR, SMART_THREE_WAY_COMPARATOR_OPERATOR,
+        ASSIGNMENT_OPERATOR, BINDING_OPERATOR, STRING_CONCATENATION_OPERATOR, STRING_REPLICATION_OPERATOR,
+        SMART_MATCH_OPERATOR, INCREMENT_OPERATOR, DECREMENT_OPERATOR, RANGE_CONSTRUCTOR, LAZY_LIST_CONSTRUCTOR,
+        RETURN_OPERATOR, // can be return, returns or -->
         REVERSED_OPERATOR, // R + any operator
-
-
-        MY_KEYWORD, DEFAULT_KEYWORD, ELSE_KEYWORD, ELSEIF_KEYWORD, FOR_KEYWORD, GET_KEYWORD,
-        GIVEN_KEYWORD, IF_KEYWORD, LOOP_KEYWORD, MULTI_KEYWORD, ORWITH_KEYWORD,
-        REPEAT_KEYWORD, SUB_KEYWORD, UNLESS_KEYWORD, UNTIL_KEYWORD,
-        WHEN_KEYWORD, WHILE_KEYWORD, WITH_KEYWORD, WITHOUT_KEYWORD, NOT_KEYWORD, CLASS_KEYWORD, HAS_KEYWORD, IS_KEYWORD,
-        METHOD_KEYWORD, SELF_KEYWORD, SUBMETHOD_KEYWORD, ROLE_KEYWORD, DOES_KEYWORD, CATCH_KEYWORD, TRY_KEYWORD,
-        USE_KEYWORD, DIE_KEYWORD, INIT_KEYWORD, CONSTANT_KEYWORD,
-
-
-        LEFT_SQ_BRACKET, RIGHT_SQ_BRACKET, LEFT_PARENTH, RIGHT_PARENTH, LEFT_ANG_BRACKET, RIGHT_AND_BRACKET,
-        LEFT_CURLY_BRACKET, RIGHT_CURLY_BRACKET, DOT, COMMA, COLON, SEMICOLON,
-
-        // can be return, returns or -->
-        RETURN,
-
         IMPLICATION,// =>
         FORWARD_FEED, // ==>
         BACKWARD_FEED, // <==
@@ -102,13 +80,30 @@ class Token {
         DOUBLE_COLUMN, // ::
         ARROW, //->
 
-        BOOLEAN,
 
-        REGEX,
+        IDENTIFIER,
+        STRING, NUMBER, BOOLEAN, REGEX,
 
+        //these are the symbols or combination of symbols that can play different roles depending on semantics, thus
+        //their tokens are generic and it is up to the following stages to define the meaning of those.
+        VERTICAL_BAR, BACKSLASH, DOLLAR_SLASH,  PERCENT_SYMBOL, AT_SYMBOL, DOLLAR_SYMBOL, AMPERSAND_SYMBOL,
         QUESTION_MARK, EXCLAMATION_MARK,
 
-        END_OF_INPUT, ERROR // not in language, for Lexer only
+        //predefined keywords
+        MY_KEYWORD, DEFAULT_KEYWORD, ELSE_KEYWORD, ELSEIF_KEYWORD, FOR_KEYWORD, GET_KEYWORD,
+        GIVEN_KEYWORD, IF_KEYWORD, LOOP_KEYWORD, MULTI_KEYWORD, ORWITH_KEYWORD,
+        REPEAT_KEYWORD, SUB_KEYWORD, UNLESS_KEYWORD, UNTIL_KEYWORD,
+        WHEN_KEYWORD, WHILE_KEYWORD, WITH_KEYWORD, WITHOUT_KEYWORD, NOT_KEYWORD, CLASS_KEYWORD, HAS_KEYWORD, IS_KEYWORD,
+        METHOD_KEYWORD, SELF_KEYWORD, SUBMETHOD_KEYWORD, ROLE_KEYWORD, DOES_KEYWORD, CATCH_KEYWORD, TRY_KEYWORD,
+        USE_KEYWORD, DIE_KEYWORD, INIT_KEYWORD, CONSTANT_KEYWORD,
+
+        LEFT_SQ_BRACKET, RIGHT_SQ_BRACKET, LEFT_PARENTH, RIGHT_PARENTH, LEFT_ANG_BRACKET, RIGHT_AND_BRACKET,
+        LEFT_CURLY_BRACKET, RIGHT_CURLY_BRACKET,
+
+        DOT, COMMA, COLON, SEMICOLON,
+
+        //These are not in language, for Lexer only
+        END_OF_INPUT, ERROR
     }
 
     /**
@@ -117,40 +112,40 @@ class Token {
      */
     static HashMap<String, PerlTokens> getTokenMapSingleton(){
         if (tokenMap == null) {
-            tokenMap = new HashMap<String, PerlTokens>(){
+            tokenMap = new HashMap<>(){
                 {
-                    put("+", PerlTokens.ADDITION); //done
-                    put("-", PerlTokens.SUBTRACTION); //done
-                    put("*", PerlTokens.MULTIPLICATION); //done
-                    put("**", PerlTokens.POWER);
-                    put("/", PerlTokens.DIVISION); //done
-                    put("div", PerlTokens.INTEGER_DIVISION); //done
-                    put("%", PerlTokens.PERCENT_SYMBOL);
-                    put("%%", PerlTokens.DIVISIBILITY);
-                    put("gcd", PerlTokens.GCD); //done
-                    put("lcm", PerlTokens.LCM); //done
-                    put("==", PerlTokens.NUMERIC_EQUAL); //done
-                    put("!=", PerlTokens.NUMERIC_NOT_EQUAL);
+                    put("+", PerlTokens.ADDITION_OPERATOR); //done
+                    put("-", PerlTokens.SUBTRACTION_OPERATOR); //done
+                    put("*", PerlTokens.MULTIPLICATION_OPERATOR); //done
+                    put("**", PerlTokens.POWER_OPERATOR);
+                    put("/", PerlTokens.DIVISION_OPERATOR); //done
+                    put("div", PerlTokens.INTEGER_DIVISION_OPERATOR); //done
+                    put("%%", PerlTokens.DIVISIBILITY_OPERATOR);
+                    put("gcd", PerlTokens.GCD_OPERATOR); //done
+                    put("lcm", PerlTokens.LCM_OPERATOR); //done
+                    put("==", PerlTokens.NUMERIC_EQUAL_OPERATOR); //done
+                    put("!=", PerlTokens.NUMERIC_NOT_EQUAL_OPERATOR);
+                    put("<=", PerlTokens.NUMERIC_LESS_THAN_OR_EQUAL_OPERATOR); //done
+                    put(">=", PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL_OPERATOR); //done
+                    put("<=>", PerlTokens.NUMERIC_THREE_WAY_COMPARATOR_OPERATOR); //done
+                    put("eq", PerlTokens.STRING_EQUAL_OPERATOR); //done
+                    put("ne", PerlTokens.STRING_NOT_EQUAL_OPERATOR);//done
+                    put("lt", PerlTokens.STRING_LESS_THAN_OPERATOR);//done
+                    put("gt", PerlTokens.STRING_GREATER_THAN_OPERATOR);//done
+                    put("le", PerlTokens.STRING_LESS_THAN_OR_EQUAL_OPERATOR);//done
+                    put("ge", PerlTokens.STRING_GREATER_THAN_OR_EQUAL_OPERATOR);//done
+                    put("leg", PerlTokens.STRING_THREE_WAY_COMPARATOR_OPERATOR);//done
+                    put("cmp", PerlTokens.SMART_THREE_WAY_COMPARATOR_OPERATOR);//done
+                    put("=", PerlTokens.ASSIGNMENT_OPERATOR); //done
+                    put("~", PerlTokens.STRING_CONCATENATION_OPERATOR);
+                    put(":=", PerlTokens.BINDING_OPERATOR);
+                    put("x", PerlTokens.STRING_REPLICATION_OPERATOR);
+                    put("~~", PerlTokens.SMART_MATCH_OPERATOR);
+                    put("++", PerlTokens.INCREMENT_OPERATOR);//done
+                    put("--", PerlTokens.DECREMENT_OPERATOR);//done
                     put("<", PerlTokens.LEFT_ANG_BRACKET); //done
                     put(">", PerlTokens.RIGHT_AND_BRACKET); //done
-                    put("<=", PerlTokens.NUMERIC_LESS_THAN_OR_EQUAL); //done
-                    put(">=", PerlTokens.NUMERIC_GREATER_THAN_OR_EQUAL); //done
-                    put("<=>", PerlTokens.NUMERIC_THREE_WAY_COMPARATOR); //done
-                    put("eq", PerlTokens.STRING_EQUAL); //done
-                    put("ne", PerlTokens.STRING_NOT_EQUAL);//done
-                    put("lt", PerlTokens.STRING_LESS_THAN);//done
-                    put("gt", PerlTokens.STRING_GREATER_THAN);//done
-                    put("le", PerlTokens.STRING_LESS_THAN_OR_EQUAL);//done
-                    put("ge", PerlTokens.STRING_GREATER_THAN_OR_EQUAL);//done
-                    put("leg", PerlTokens.STRING_THREE_WAY_COMPARATOR);//done
-                    put("cmp", PerlTokens.SMART_THREE_WAY_COMPARATOR);//done
-                    put("=", PerlTokens.ASSIGNMENT); //done
-                    put("~", PerlTokens.STRING_CONCATENATION);
-                    put(":=", PerlTokens.BINDING);
-                    put("x", PerlTokens.STRING_REPLICATION);
-                    put("~~", PerlTokens.SMART_MATCH);
-                    put("++", PerlTokens.INCREMENT);//done
-                    put("--", PerlTokens.DECREMENT);//done
+                    put("%", PerlTokens.PERCENT_SYMBOL);
                     put("..", PerlTokens.RANGE_CONSTRUCTOR);
                     put("..^", PerlTokens.RANGE_CONSTRUCTOR);
                     put("^..", PerlTokens.RANGE_CONSTRUCTOR);
@@ -174,9 +169,9 @@ class Token {
                     put("multi", PerlTokens.MULTI_KEYWORD);//done
                     put("orwith", PerlTokens.ORWITH_KEYWORD);//done
                     put("repeat", PerlTokens.REPEAT_KEYWORD);//done
-                    put("return", PerlTokens.RETURN);//done
-                    put("returns", PerlTokens.RETURN);//done
-                    put("-->", PerlTokens.RETURN);//done
+                    put("return", PerlTokens.RETURN_OPERATOR);//done
+                    put("returns", PerlTokens.RETURN_OPERATOR);//done
+                    put("-->", PerlTokens.RETURN_OPERATOR);//done
                     put("sub", PerlTokens.SUB_KEYWORD);//done
                     put("unless", PerlTokens.UNLESS_KEYWORD);//done
                     put("until", PerlTokens.UNTIL_KEYWORD);//done
@@ -221,6 +216,7 @@ class Token {
                     put("!", PerlTokens.EXCLAMATION_MARK);
                     put("\\", PerlTokens.BACKSLASH);
                     put("$/", PerlTokens.DOLLAR_SLASH);
+                    put("R", PerlTokens.REVERSED_OPERATOR);
                 }
             };
 
