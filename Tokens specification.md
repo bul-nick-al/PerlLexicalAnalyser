@@ -5,11 +5,11 @@
 #### Description.
 
 
-This document provides description for each token the lexer may use. Since it was not specified in thask, for which version of Perl we have to implement the lexer, we have chosen Perl6. And since Perl6 is on development and its structure and format are constanntly under descussion, it is possible that tokens may vary significantly. The source we have chosen for the reference can be found [here](https://perl6intro.com)
+This document provides a general description of the tokens the lexer may use. Since it was not specified in task, for which version of Perl we have to implement the lexer, we have chosen Perl6. And since Perl6 is on development and its structure and format are constantly under discussion, it is possible that tokens may vary significantly. The source we have chosen for the reference can be found [here](https://perl6intro.com)
 
 #### Tokens. 
 
-There are in total __104__ tokens the lexer can recognise. They are conceptully divided into subclasses:
+There are in total __104__ tokens the lexer can recognise. They are conceptually divided into subclasses:
 - Operators
 - Keywords
 - Paired tokens
@@ -43,7 +43,7 @@ LEFT_CURLY_BRACKET {
 ```
 
 ##### Ambiguous tokens. 
-Some literals in Perl can mean differnt things depending on the context. For example, `%` is used both for hashes (e.g. `%my-hash`) and for modulo. In such cases just the name of the token is just the same as the literal and it is up to the following stages to idetify its actual meaning. For example, `?` will be tokenized as this: 
+Some literals in Perl can mean differnt things depending on the context. For example, `%` is used both for hashes (e.g. `%my-hash`) and for modulo. In such cases just the name of the token is just the same as the literal and it is up to the following stages to identify its actual meaning. For example, `?` will be tokenized as this: 
 ```
 QUESTION_MARK ?
 ```
@@ -63,13 +63,13 @@ SEMICOLON ;
 ```
 
 ##### Auxiliary tokens. 
-These are the tokens which are used by the lexes to report service information and they do not represent anything from the Perl6 defnition. There are only two such tokens: `END_OF_INPUT` and `ERROR`. For example, when there are no more literal to tokenise, i.e. all code has been parces, the folowing token is returned:
+These are the tokens which are used by the lexes to report service information and they do not represent anything from the Perl6 defnition. There are only two such tokens: `END_OF_INPUT` and `ERROR`. For example, when there are no more literal to tokenize, i.e. all code has been parses, the following token is returned:
 ```
 END_OF_INPUT 
 ```
 
 #### P.S.
-In this document we only provide a general description of the tokens of the lexer. The detailed information about them can be inferred from this documend used along with the `Token.java` file and from [the reference site](https://perl6intro.com)
+In this document we only provide a general description of the tokens of the lexer. The detailed information about them can be inferred from this document used along with the `Token.java` file and from [the reference site](https://perl6intro.com)
 
 
 
