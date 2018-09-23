@@ -14,15 +14,15 @@ public class Main {
      * @param args default command line arguments
      */
     public static void main(String[] args) {
+        String output = "";
         Lexer lexer = new Lexer(readFile());
         Token token = lexer.getNextToken();
-        System.out.print(token.getType() + " ");
-        System.out.println(token.getValue());
+        output += token.getType() + token.getValue();
         while (token.getType() != Token.PerlTokens.END_OF_INPUT&&token.getType() != Token.PerlTokens.ERROR) {
             token = lexer.getNextToken();
-            System.out.print(token.getType() + " ");
-            System.out.println(token.getValue());
+            output += token.getType() + token.getValue();
         }
+        writeFile(output);
     }
 
     /**
@@ -32,7 +32,7 @@ public class Main {
      static LinkedList<String> readFile() {
         LinkedList<String> result = new LinkedList<>();
         try {
-            Scanner in = new Scanner(new File("STD.pm6.txt"));
+            Scanner in = new Scanner(new File("in.txt"));
             while (in.hasNext())
                 result.add(in.nextLine());
         } catch (Exception ex) {
