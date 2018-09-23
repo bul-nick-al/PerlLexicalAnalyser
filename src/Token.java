@@ -1,16 +1,23 @@
 import java.util.HashMap;
 
+/**
+ * Class which describes Token
+ */
 class Token {
 
     private int line;
     private int position;
-
-
-
     private PerlTokens type;
     private String value;
+    private static HashMap<String, PerlTokens> tokenMap;
 
-
+    /**
+     * Constructor of the class
+     * @param type of the token from PerlTokens enum
+     * @param value of the token in String
+     * @param line is a line where is token from the beginning of input file
+     * @param position is a position of the token from the beginning of current line
+     */
     Token(PerlTokens type, String value, int line, int position) {
         this.type = type;
         this.value = value;
@@ -18,24 +25,42 @@ class Token {
         this.position = position;
     }
 
-    public PerlTokens getType() {
+    /**
+     * Getter of the private type attribute
+     * @return type of the token
+     */
+    PerlTokens getType() {
         return type;
     }
 
-    public String getValue() {
+    /**
+     * Getter of the private value attribute
+     * @return value of the token
+     */
+    String getValue() {
         return value;
     }
 
-    public int getLine() {
+    /**
+     * Getter of the private line attribute
+     * @return line where is token from the beginning of input file
+     */
+    int getLine() {
         return line;
     }
 
-    public int getPosition() {
+    /**
+     * Getter of the private position attribute
+     * @return position of the token from the beginning of current line
+     */
+    int getPosition() {
         return position;
     }
 
-
-    public enum PerlTokens {
+    /**
+     * Enum describes all types of tokens in the Perl6 language
+     */
+    enum PerlTokens {
         ADDITION, SUBTRACTION, MULTIPLICATION, POWER, DIVISION, INTEGER_DIVISION, DIVISIBILITY,
         GCD, LCM, NUMERIC_EQUAL, NUMERIC_NOT_EQUAL,
         NUMERIC_LESS_THAN_OR_EQUAL, NUMERIC_GREATER_THAN_OR_EQUAL, NUMERIC_THREE_WAY_COMPARATOR,
@@ -86,9 +111,11 @@ class Token {
         END_OF_INPUT, ERROR // not in language, for Lexer only
     }
 
-    private static HashMap<String, PerlTokens> tokenMap;
-
-    public static HashMap<String, PerlTokens> getTokenMapSingleton(){
+    /**
+     * Method prepares hash map for easy mapping token types to their string representation
+     * @return hash map which maps tokenTupes from PerlTokens enum to their string representation
+     */
+    static HashMap<String, PerlTokens> getTokenMapSingleton(){
         if (tokenMap == null) {
             tokenMap = new HashMap<String, PerlTokens>(){
                 {

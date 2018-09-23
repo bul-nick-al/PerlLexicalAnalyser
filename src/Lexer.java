@@ -110,7 +110,6 @@ public class Lexer {
         while (true) {
             checkEndOfString();
             if (currentSubstring.contains("method_def")) {
-                System.out.println("AAAAAAAAAA");
                 x = false;
             }
             if (input.get(currentLine).charAt(currentSymbol) == '<') {
@@ -205,12 +204,6 @@ public class Lexer {
                         currentSymbol--;
                     }
 
-                    //убрать?
-                    if (getSubstring(currentSymbol + 3).matches("<.\\[") && isNoEscape()) {
-                        currentSymbol+=3;
-                        getInnerRecursionEmbeddings("<?[");
-                        currentSymbol--;
-                    }
                     if (getSubstring(currentSymbol + 2).equals("<(") && isNoEscape()) {
                         currentSymbol+=2;
                         getInnerRecursionEmbeddings("<(");
@@ -387,7 +380,6 @@ public class Lexer {
         checkEndOfString();
         if (currentSymbol == 0) {
             //пропустить строку, если она пустая
-
             if (input.get(currentLine).isEmpty()) {
                 currentLine++;
                 currentSymbol = 0;

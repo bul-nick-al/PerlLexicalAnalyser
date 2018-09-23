@@ -1,15 +1,9 @@
 
 import org.junit.Test;
-
-import java.io.File;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by rozaliaamirova on 22.09.2018.
- */
 public class LexerTest {
     private Lexer lexerMultiline;
     private Lexer lexerSingleline;
@@ -17,7 +11,6 @@ public class LexerTest {
     private void initTests() {
         LinkedList<String> singlelineTest = new LinkedList<>();
         singlelineTest.add("try to use magic for writing perl lexer! <8");
-
         LinkedList<String> multilineTest = new LinkedList<>();
 
         multilineTest.add("lexer");
@@ -37,6 +30,11 @@ public class LexerTest {
         multilineTest.add("token testToken { [ \" abc \" ] }");
         multilineTest.add("token testToken { [ ' abc ' ] }");
         multilineTest.add("token testToken { [ { abc } ] }");
+        multilineTest.add("");
+        multilineTest.add("rule test { [ { } ] }");
+        multilineTest.add("rule test { [ [ ] ] }");
+        multilineTest.add("rule \test { [ <?( )> ] }");
+        multilineTest.add("rule <test>hello { <?[ ]> ] }");
         lexerMultiline = new Lexer(multilineTest);
         lexerSingleline = new Lexer(singlelineTest);
     }
@@ -143,7 +141,21 @@ public class LexerTest {
         assertEquals(Token.PerlTokens.REGEX, testToken17.getType());
         assertEquals("token testToken { [ { abc } ] }", testToken17.getValue());
 
+        Token testToken18 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken18.getType());
+        assertEquals("rule test { [ { } ] }", testToken18.getValue());
+
+        Token testToken19 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken19.getType());
+        assertEquals("rule test { [ [ ] ] }", testToken19.getValue());
+
+        Token testToken20 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken20.getType());
+        assertEquals("rule \test { [ <?( )> ] }", testToken20.getValue());
+
+        Token testToken21 = lexerMultiline.getNextToken();
+        assertEquals(Token.PerlTokens.REGEX, testToken21.getType());
+        assertEquals("rule <test>hello { <?[ ]> ] }", testToken21.getValue());
+
     }
-
-
 }

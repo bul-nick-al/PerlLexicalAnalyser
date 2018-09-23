@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * Class Launches the program, creates and starts Lexical Recognizer
+ */
 public class Main {
 
-    public static Lexer lexer;
-
+    /**
+     * Main method of the program, which launches the main algorithm of lexical analysis
+     * @param args default command line arguments
+     */
     public static void main(String[] args) {
-        lexer = new Lexer(readFile());
+        Lexer lexer = new Lexer(readFile());
         Token token = lexer.getNextToken();
         System.out.print(token.getType() + " ");
         System.out.println(token.getValue());
@@ -27,8 +32,7 @@ public class Main {
     public static LinkedList<String> readFile() {
         LinkedList<String> result = new LinkedList<>();
         try {
-            Scanner in = new Scanner(new File("myExample.txt"));
-            StringBuffer data = new StringBuffer();
+            Scanner in = new Scanner(new File("STD.pm6.txt"));
             while (in.hasNext())
                 result.add(in.nextLine());
         } catch (Exception ex) {

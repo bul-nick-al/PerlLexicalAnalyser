@@ -1,13 +1,21 @@
 /**
- * Created by rozaliaamirova on 16.09.2018.
+ * Class which checks whether symbol can be the beginning of some types of lexical units
  */
 public class SymbolTypeRecognizer {
 
-    public enum SymbolType {
+    /**
+     * Defines symbol types as beginnings of lexical units
+     */
+    enum SymbolType {
         STRING_CANDIDATE, NUMBER_CANDIDATE, WORD_CANDIDATE, COMMENT_CANDIDATE, REGEX_CANDIDATE, UNDEFINED
     }
 
-    public static SymbolType recognize(char input) {
+    /**
+     * Method which recognize symbol as a start of lexical unit
+     * @param input symbol which needs to be recognized
+     * @return type of the lexical unit which can begin with given input char
+     */
+    static SymbolType recognize(char input) {
         if (input == '\'' || input == '"')
             return SymbolType.STRING_CANDIDATE;
         if (String.valueOf(input).matches("\\d"))
