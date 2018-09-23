@@ -1,8 +1,10 @@
 import java.util.Arrays;
 import java.util.LinkedList;
 
+/**
+ * This class is responsible for tokinisation of Perl6 code
+ */
 public class Lexer {
-    boolean x = false;
 
     private LinkedList<String> input;
     private int currentLine;
@@ -16,43 +18,168 @@ public class Lexer {
         symbolTypeRecognizer = new SymbolTypeRecognizer();
     }
 
-    private void checkEndOfString() {
-        if (currentSymbol >= input.get(currentLine).length()) {
-            currentLine++;
-            currentSymbol = 0;
-            checkEndOfString();
-        }
+    /**
+     * Finds next token
+     * @return next token
+     */
+
+    Token getNextToken() {
+        //if there are no more literals, report that tokenisation is finished
+        if (endOfInput())
+            return new Token(Token.PerlTokens.END_OF_INPUT, "", currentLine, currentSymbol);
+        checkForEmptyLinesAndSpaces();//skip spaces and emplty lines
+        if (isMultilineComment()) //skip multiline comments
+            return getNextToken();
+        return findMatchingPattern();
     }
 
-    private String getSubstring(int endSymbol) {
+    /**
+     * Finds to which patter the current literal corresponds and creates the corresponding token
+     * @return new Token 
+     */
+    private Token findMatchingPattern() {
+        char character = getCharacter(currentSymbol);
+        SymbolTypeRecognizer.SymbolType type = SymbolTypeRecognizer.recognize(character);
+        switch (type) {
+            case STRING_CANDIDATE:
+                return tokeniseStringCandidate();
+            case NUMBER_CANDIDATE:
+                return tokeniseNumberCandidate();
+            case WORD_CANDIDATE:
+                return tokeniseWordCandidate();
+            case COMMENT_CANDIDATE:
+                return tokeniseCommentCandidate();
+            case REGEX_CANDIDATE:
+                return tokeniseRegexCandidate();
+            case UNDEFINED:
+                return tokeniseReservedCandidate();
+        }
+        return null;
+    }
+
+    /**
+     * creates a token for a word candidate
+     * @return
+     */
+    private Token tokeniseWordCandidate(){
+        //if it is a word candidate, there are four options for what it can be. We find the longest matching
+        // pattern of those and return the corresponding token.
+        int tempCurrent;
+        int namedRegexPosition = recogniseNamedRegexToken(), identifierPosition = recogniseIdentifierToken(),
+                reservedPosition = recogniseReservedToken(), regexPosition = recogniseRegexToken();
+        int[] positions = {identifierPosition, reservedPosition, regexPosition, namedRegexPosition};
+        int longestMatchingPosition = Arrays.stream(positions).max().getAsInt();
+        if (longestMatchingPosition == namedRegexPosition) {
+            return getNamedRegexToken();
+        }
+        if (longestMatchingPosition == reservedPosition) {
+            tempCurrent = currentSymbol;
+            currentSymbol = reservedPosition;
+            return new Token(Token.getTokenMapSingleton().get(getSubstring(tempCurrent, reservedPosition)),
+                    getSubstring(tempCurrent, reservedPosition), currentLine, tempCurrent);
+        }
+        if (longestMatchingPosition == identifierPosition) {
+            tempCurrent = currentSymbol;
+            currentSymbol = identifierPosition;
+            return new Token(Token.PerlTokens.IDENTIFIER,
+                    getSubstring(tempCurrent, identifierPosition), currentLine, tempCurrent);
+        }
+        if (longestMatchingPosition == regexPosition) {
+            tempCurrent = currentSymbol;
+            currentSymbol = regexPosition;
+            return new Token(Token.PerlTokens.REGEX,
+                    getSubstring(tempCurrent, regexPosition), currentLine, tempCurrent);
+        }
+        return null;
+    }
+    /**
+     * creates a token for a number candidate
+     * @return
+     */
+    private Token tokeniseNumberCandidate(){
+        int endSymbol;
+        int tempCurrent;
+        endSymbol = recogniseNumberToken();
+        tempCurrent = currentSymbol;
+        currentSymbol = endSymbol;
+        return new Token(Token.PerlTokens.NUMBER,
+                getSubstring(tempCurrent, endSymbol), currentLine, tempCurrent);
+    }
+    /**
+     * creates a token for a string candidate
+     * @return
+     */
+    private Token tokeniseStringCandidate(){
+        int endSymbol;
+        int tempCurrent;
+        if ((endSymbol = recogniseStringToken()) != -1) {
+            tempCurrent = currentSymbol;
+            currentSymbol = endSymbol;
+            return new Token(Token.PerlTokens.STRING,
+                    getSubstring(tempCurrent, endSymbol), currentLine, tempCurrent);
+        }
+        return new Token(Token.PerlTokens.ERROR,
+                "string literal has no closing quotes", currentLine, currentSymbol);
+    }
+    /**
+     * creates a token for a comment candidate
+     * @return
+     */
+    private Token tokeniseCommentCandidate(){
+        int commentPosition = recogniseEmbeddedToken();
+        currentSymbol = commentPosition == -1 ? input.get(currentLine).length() : commentPosition;
+        return getNextToken();
+    }
+    /**
+     * creates a token for a regex candidate
+     * @return
+     */
+    private Token tokeniseRegexCandidate(){
+        int endSymbol;
+        int tempCurrent;
+        endSymbol = recogniseRegexToken();
+        tempCurrent = currentSymbol;
+        currentSymbol = endSymbol;
+        return new Token(Token.PerlTokens.REGEX, getSubstring(tempCurrent, endSymbol), currentLine, tempCurrent);
+    }
+    /**
+     * creates a token for a reserved word candidate
+     * @return
+     */
+    private Token tokeniseReservedCandidate(){
+        int endSymbol;
+        int tempCurrent;
+        endSymbol = recogniseReservedToken();
+        tempCurrent = currentSymbol;
+        currentSymbol = endSymbol;
         try {
-            if (x)
-                System.out.println(input.get(currentLine).substring(currentSymbol, endSymbol));
-            return input.get(currentLine).substring(currentSymbol, endSymbol);
-        } catch (Exception e) {
-            return "";
+            return new Token(Token.getTokenMapSingleton().get(getSubstring(tempCurrent, endSymbol)),
+                    getSubstring(tempCurrent, endSymbol), currentLine, tempCurrent);
+        } catch (Exception e){
+            return (new Token(Token.PerlTokens.ERROR,
+                    "An error occurred while tokenisation", currentLine, currentSymbol));
         }
     }
 
-    private String getSubstring(int startSymbol, int endSymbol) {
-        try {
-            return input.get(currentLine).substring(startSymbol, endSymbol);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
+    /**
+     * finds longest possible number relative to the current position
+     * @return the position of the end of the number
+     */
     private int recogniseNumberToken() {
         int endSymbol = currentSymbol + 1;
         int longestMatchingPosition = 0;
         while (endSymbol <= input.get(currentLine).length()) {
-            if (PatternsRecogniser.isNumber(input.get(currentLine).substring(currentSymbol, endSymbol)))
+            if (PatternsRecogniser.isNumber(getSubstring(currentSymbol, endSymbol)))
                 longestMatchingPosition = endSymbol;
             endSymbol++;
         }
         return longestMatchingPosition;
     }
 
+    /**
+     * finds the possible string relative to the current position
+     * @return the position of the end of the string
+     */
     private int recogniseStringToken() {
         int endSymbol = currentSymbol + 1;
         try {
@@ -65,28 +192,38 @@ public class Lexer {
         }
     }
 
+    /**
+     * finds longest possible identifier relative to the current position
+     * @return the position of the end of the identifier
+     */
     private int recogniseIdentifierToken() {
         int endSymbol = currentSymbol;
         int longestMatchingPosition = 0;
         while (endSymbol < input.get(currentLine).length()) {
-            if (PatternsRecogniser.isIdentifier(input.get(currentLine).substring(currentSymbol, endSymbol + 1)))
+            if (PatternsRecogniser.isIdentifier(getSubstring(currentSymbol, endSymbol + 1)))
                 longestMatchingPosition = endSymbol + 1;
             endSymbol++;
         }
         return longestMatchingPosition;
     }
-
+    /**
+     * finds longest possible number relative to the current position
+     * @return the position of the end of the number
+     */
     private int recogniseRegexToken() {
         int endSymbol = currentSymbol;
         int longestMatchingPosition = 0;
         while (endSymbol < input.get(currentLine).length()) {
-            if (PatternsRecogniser.isRegex(input.get(currentLine).substring(currentSymbol, endSymbol + 1)))
+            if (PatternsRecogniser.isRegex(getSubstring(currentSymbol, endSymbol + 1)))
                 longestMatchingPosition = endSymbol + 1;
             endSymbol++;
         }
         return longestMatchingPosition;
     }
-
+    /**
+     * finds longest possible regex relative to the current position
+     * @return the position of the end of the number
+     */
     private int recogniseNamedRegexToken() {
         int longestMatchingPosition = 0;
         if (PatternsRecogniser.isNamedRegex(input.get(currentLine))) {
@@ -95,6 +232,10 @@ public class Lexer {
         return longestMatchingPosition;
     }
 
+    /**
+     * finds longest possible regex relative to the current position
+     * @return the position of the end of the number
+     */
     private Token getNamedRegexToken() {
         String result = getNamedRegexWithEmbeddedParanthesis();
         currentLine++;
@@ -102,23 +243,19 @@ public class Lexer {
         return new Token(Token.PerlTokens.REGEX, result, currentLine, currentSymbol);
     }
 
-    //ищем тело регулярного выражения, заключенное в { }
     private String getNamedRegexWithEmbeddedParanthesis() {
         boolean isAnglesParenthesis = false;
         String currentSubstring;
         currentSubstring = "";
         while (true) {
             checkEndOfString();
-            if (currentSubstring.contains("method_def")) {
-                x = false;
-            }
-            if (input.get(currentLine).charAt(currentSymbol) == '<') {
+            if (getCharacter(currentSymbol) == '<') {
                 isAnglesParenthesis = true;
             }
-            if (input.get(currentLine).charAt(currentSymbol) == '>') {
+            if (getCharacter(currentSymbol) == '>') {
                 isAnglesParenthesis = false;
             }
-            if (input.get(currentLine).charAt(currentSymbol) == '{' && !isAnglesParenthesis) {
+            if (getCharacter(currentSymbol) == '{' && !isAnglesParenthesis) {
                 int tempLine = currentLine;
                 int tempSymbol = currentSymbol;
                 currentSymbol++;
@@ -129,10 +266,10 @@ public class Lexer {
                     stringBuilder.append(input.get(i));
                 }
                 if (tempLine < currentLine)
-                    stringBuilder.append(input.get(currentLine).substring(0, currentSymbol));
+                    stringBuilder.append(getSubstring(0, currentSymbol));
                 return currentSubstring + stringBuilder.toString();
             } else {
-                currentSubstring += String.valueOf(input.get(currentLine).charAt(currentSymbol));
+                currentSubstring += String.valueOf(getCharacter(currentSymbol));
                 currentSymbol++;
             }
         }
@@ -219,7 +356,7 @@ public class Lexer {
                         int j = currentSymbol;
                         String currentSubstring = "";
                         while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*\\]>")) {
-                            currentSubstring += input.get(currentLine).charAt(j);
+                            currentSubstring += getCharacter(j);
                             j++;
                         }
                         if (currentSubstring.matches("<.*\\[.*\\]>")) {
@@ -273,7 +410,7 @@ public class Lexer {
                         int j = currentSymbol;
                         String currentSubstring = "";
                         while (j < input.get(currentLine).length() && !currentSubstring.matches("<.*\\[.*\\]>")) {
-                            currentSubstring += input.get(currentLine).charAt(j);
+                            currentSubstring += getCharacter(j);
                             j++;
                         }
                         if (currentSubstring.matches("<.*\\[.*\\]>")) {
@@ -290,7 +427,7 @@ public class Lexer {
         int endSymbol = currentSymbol;
         int longestMatchingPosition = 0;
         while (endSymbol < input.get(currentLine).length()) {
-            if (Token.getTokenMapSingleton().containsKey(input.get(currentLine).substring(currentSymbol, endSymbol + 1)))
+            if (Token.getTokenMapSingleton().containsKey(getSubstring(currentSymbol, endSymbol + 1)))
                 longestMatchingPosition = endSymbol + 1;
             endSymbol++;
         }
@@ -302,105 +439,93 @@ public class Lexer {
         do {
             endSymbol++;
         }
-        while (endSymbol < input.get(currentLine).length() && !PatternsRecogniser.isEmbeddedComment(input.get(currentLine).substring(currentSymbol, endSymbol)));
+        while (endSymbol < input.get(currentLine).length() && !PatternsRecogniser.isEmbeddedComment(getSubstring(currentSymbol, endSymbol)));
 
-        if (endSymbol == input.get(currentLine).length() && !PatternsRecogniser.isEmbeddedComment(input.get(currentLine).substring(currentSymbol, endSymbol))) {
+        if (endSymbol == input.get(currentLine).length() && !PatternsRecogniser.isEmbeddedComment(getSubstring(currentSymbol, endSymbol))) {
             return -1;
         }
         return endSymbol;
     }
 
-    private Token findMatchingPattern() {
-        char character = input.get(currentLine).charAt(currentSymbol);
-        SymbolTypeRecognizer.SymbolType type = SymbolTypeRecognizer.recognize(character);
-        int endSymbol;
-        int tempCurrent;
-        switch (type) {
-            case STRING_CANDIDATE:
-                if ((endSymbol = recogniseStringToken()) != -1) {
-                    tempCurrent = currentSymbol;
-                    currentSymbol = endSymbol;
-                    return new Token(Token.PerlTokens.STRING, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
-                }
-            case NUMBER_CANDIDATE:
-                endSymbol = recogniseNumberToken();
-                tempCurrent = currentSymbol;
-                currentSymbol = endSymbol;
-                return new Token(Token.PerlTokens.NUMBER, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
-            case WORD_CANDIDATE:
-                int namedRegexPosition = recogniseNamedRegexToken(), identifierPosition = recogniseIdentifierToken(), reservedPosition = recogniseReservedToken(), regexPosition = recogniseRegexToken();
-                int[] positions = {identifierPosition, reservedPosition, regexPosition, namedRegexPosition};
-                int longestMatchingPosition = Arrays.stream(positions).max().getAsInt();
-                if (longestMatchingPosition == namedRegexPosition) {
-                    return getNamedRegexToken();
-                }
-                if (longestMatchingPosition == reservedPosition) {
-                    tempCurrent = currentSymbol;
-                    currentSymbol = reservedPosition;
-                    return new Token(Token.getTokenMapSingleton().get(input.get(currentLine).substring(tempCurrent, reservedPosition)),
-                            input.get(currentLine).substring(tempCurrent, reservedPosition), currentLine, tempCurrent);
-                }
-                if (longestMatchingPosition == identifierPosition) {
-                    tempCurrent = currentSymbol;
-                    currentSymbol = identifierPosition;
-                    return new Token(Token.PerlTokens.IDENTIFIER, input.get(currentLine).substring(tempCurrent, identifierPosition), currentLine, tempCurrent);
-                }
-                if (longestMatchingPosition == regexPosition) {
-                    tempCurrent = currentSymbol;
-                    currentSymbol = regexPosition;
-                    return new Token(Token.PerlTokens.REGEX, input.get(currentLine).substring(tempCurrent, regexPosition), currentLine, tempCurrent);
-                }
-            case COMMENT_CANDIDATE:
-                int commentPosition = recogniseEmbeddedToken();
-                if (commentPosition == -1) {
-                    currentSymbol = input.get(currentLine).length();
-                } else {
-                    currentSymbol = commentPosition;
-                }
-                return getNextToken();
-            case REGEX_CANDIDATE:
-                endSymbol = recogniseRegexToken();
-                tempCurrent = currentSymbol;
-                currentSymbol = endSymbol;
-                return new Token(Token.PerlTokens.REGEX, input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
-            case UNDEFINED:
-                endSymbol = recogniseReservedToken();
-                tempCurrent = currentSymbol;
-                currentSymbol = endSymbol;
-                return new Token(Token.getTokenMapSingleton().get(input.get(currentLine).substring(tempCurrent, endSymbol)),
-                        input.get(currentLine).substring(tempCurrent, endSymbol), currentLine, tempCurrent);
-        }
-        return null;
-    }
+    /***********************These are some auxiliary methods used for tokenisation***********************************/
 
-    Token getNextToken() {
-        if (endOfInput()) {
-            return new Token(Token.PerlTokens.END_OF_INPUT, "", currentLine, currentSymbol);
-        }
+    /**
+     * Checks if there are empty lines or spaces, and if yes, skips them.
+     */
+    private void checkForEmptyLinesAndSpaces(){
         checkEndOfString();
-        if (currentSymbol == 0) {
-            //пропустить строку, если она пустая
-            if (input.get(currentLine).isEmpty()) {
-                currentLine++;
-                currentSymbol = 0;
-            } else if (input.get(currentLine).matches("\\s*=begin comment(\\s.*)*")) {
-                do {
-                    currentLine++;
-
-                } while (!input.get(currentLine).matches("\\s*=end comment\\s*"));
-                currentLine++;
-                return getNextToken();
-            }
+        if (input.get(currentLine).isEmpty()) {
+            currentLine++;
+            currentSymbol = 0;
+            return;
         }
-        //пропустить пробелы
-        while (input.get(currentLine).charAt(currentSymbol) == ' ') {
+        while (getCharacter(currentSymbol) == ' ') {
             currentSymbol++;
             checkEndOfString();
         }
-        return findMatchingPattern();
     }
 
-    private Boolean endOfInput() {
-        return currentLine > input.size() - 1 || currentLine >= input.size() - 1 && currentSymbol >= input.get(currentLine).length();
+    /**
+     * @return true if the current part of code is a multiline comment, false otherwise
+     */
+    private boolean isMultilineComment(){
+        if ((currentSymbol == 0) && PatternsRecogniser.isStartOfMultilineComment(input.get(currentLine))) {
+            do {
+                currentLine++;
+            } while (!PatternsRecogniser.isEndOfMultilineComment(input.get(currentLine)));
+            currentLine++;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * checks if current symbol is at the end of string and adjusts the position to the next line
+     */
+    private void checkEndOfString() {
+        if (currentSymbol >= input.get(currentLine).length()) {
+            currentLine++;
+            currentSymbol = 0;
+            checkEndOfString();
+        }
+    }
+
+    /**
+     * @param endSymbol
+     * @return the substring of the string at current line in rage from the current symbol till endSymbol
+     */
+    private String getSubstring(int endSymbol) {
+        try {
+            return input.get(currentLine).substring(currentSymbol, endSymbol);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     *
+     * @param startSymbol
+     * @param endSymbol
+     * @return the substring of the string at current line in rage from startSymbol till endSymbol
+     */
+    private String getSubstring(int startSymbol, int endSymbol) {
+        try {
+            return input.get(currentLine).substring(startSymbol, endSymbol);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private Character getCharacter(int index){
+        return input.get(currentLine).charAt(index);
+    }
+
+    /**
+     * check if there are no more literal for tokenisation
+     * @return
+     */
+    private boolean endOfInput() {
+        return currentLine > input.size() - 1 
+                || currentLine >= input.size() - 1 && currentSymbol >= input.get(currentLine).length();
     }
 }

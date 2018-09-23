@@ -9,7 +9,8 @@ class PatternsRecogniser {
     private static final String NAMED_REGEX_REGEX = ".*regex.*|.*token.*|.*rule.*";
     private static final String IDENTIFIER_REGEX = "([_a-zA-Z]|[a-zA-Z]'|[a-zA-Z]-)(([a-zA-Z\\d_]|[a-zA-Z]'|[a-zA-Z]-)*[_a-zA-Z\\d])??";
     private static final String EMBEDDED_COMMENT_REGEX = "#`\\([^)]*\\)";
-
+    private static final String START_OF_MULTILINE_COMMENT = "\\s*=begin comment(\\s.*)*";
+    private static final String END_OF_MULTILINE_COMMENT = "\\s*=end comment\\s*";
     /**
      * Method which checks whether given string is string in Perl6
      * @param string input string
@@ -17,6 +18,24 @@ class PatternsRecogniser {
      */
     static boolean isString(String string){
         return string.matches(STRING_REGEX);
+    }
+
+    /**
+     * Method which checks whether given string is the start of a multiline comment in Perl6
+     * @param string input string
+     * @return true if input is string, false otherwise
+     */
+    static boolean isStartOfMultilineComment(String string){
+        return string.matches(START_OF_MULTILINE_COMMENT);
+    }
+
+    /**
+     * Method which checks whether given string is the end of a multiline cooment in Perl6
+     * @param string input string
+     * @return true if input is string, false otherwise
+     */
+    static boolean isEndOfMultilineComment(String string){
+        return string.matches(END_OF_MULTILINE_COMMENT);
     }
 
     /**
