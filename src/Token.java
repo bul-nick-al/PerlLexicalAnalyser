@@ -72,13 +72,13 @@ class Token {
         SMART_MATCH_OPERATOR, INCREMENT_OPERATOR, DECREMENT_OPERATOR, RANGE_CONSTRUCTOR, LAZY_LIST_CONSTRUCTOR,
         RETURN_OPERATOR, // can be return, returns or -->
         REVERSED_OPERATOR, // R + any operator
-        IMPLICATION,// =>
-        FORWARD_FEED, // ==>
-        BACKWARD_FEED, // <==
-        HYPER_OPERATOR, // >>
-        CARET, // ^
-        DOUBLE_COLUMN, // ::
-        ARROW, //->
+        IMPLICATION_OPERATOR,// =>
+        FORWARD_FEED_OPERATOR, // ==>
+        BACKWARD_FEED_OPERATOR, // <==
+        HYPER_OPERATOR_OPERATOR, // >>
+        CARET_OPERATOR, // ^
+        DOUBLE_COLUMN_OPERATOR, // ::
+        ARROW_OPERATOR, //->
 
 
         IDENTIFIER,
@@ -150,7 +150,7 @@ class Token {
                     put("..^", PerlTokens.RANGE_CONSTRUCTOR);
                     put("^..", PerlTokens.RANGE_CONSTRUCTOR);
                     put("^..^", PerlTokens.RANGE_CONSTRUCTOR);
-                    put("^", PerlTokens.CARET);
+                    put("^", PerlTokens.CARET_OPERATOR);
                     put("...", PerlTokens.LAZY_LIST_CONSTRUCTOR);
                     put("…", PerlTokens.LAZY_LIST_CONSTRUCTOR);
                     put("|", PerlTokens.VERTICAL_BAR);
@@ -204,12 +204,12 @@ class Token {
                     put(",", PerlTokens.COMMA);
                     put(":", PerlTokens.COLON);
                     put(";", PerlTokens.SEMICOLON);
-                    put("=>", PerlTokens.IMPLICATION);
-                    put("==>", PerlTokens.FORWARD_FEED);//done
-                    put("<==", PerlTokens.BACKWARD_FEED);//done
-                    put(">>", PerlTokens.HYPER_OPERATOR);
-                    put("::", PerlTokens.DOUBLE_COLUMN);
-                    put("->", PerlTokens.ARROW);
+                    put("=>", PerlTokens.IMPLICATION_OPERATOR);
+                    put("==>", PerlTokens.FORWARD_FEED_OPERATOR);//done
+                    put("<==", PerlTokens.BACKWARD_FEED_OPERATOR);//done
+                    put(">>", PerlTokens.HYPER_OPERATOR_OPERATOR);
+                    put("::", PerlTokens.DOUBLE_COLUMN_OPERATOR);
+                    put("->", PerlTokens.ARROW_OPERATOR);
                     put("True", PerlTokens.BOOLEAN);//done
                     put("False", PerlTokens.BOOLEAN);//done
                     put("?", PerlTokens.QUESTION_MARK);
