@@ -42,7 +42,7 @@ public class Main {
     }
 
     /**
-     * Method for writing output to output.txt
+     * Method for writing output to out.txt
      */
      static void writeFile(String output) {
         try (final FileWriter writer = new FileWriter("out.txt", false)) {

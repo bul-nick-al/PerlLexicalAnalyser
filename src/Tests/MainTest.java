@@ -19,11 +19,9 @@ public class MainTest {
     @Test
     public void writeFile() throws Exception {
         Main.writeFile("Hello!");
-        String a = Main.readFile().get(0);
-
         LinkedList<String> result = new LinkedList<>();
         try {
-            Scanner in = new Scanner(new File("output.txt"));
+            Scanner in = new Scanner(new File("out.txt"));
             while (in.hasNext())
                 result.add(in.nextLine());
         } catch (Exception ex) {

@@ -138,9 +138,6 @@ class Token {
                     put("cmp", PerlTokens.SMART_THREE_WAY_COMPARATOR_OPERATOR);//done
                     put("=", PerlTokens.ASSIGNMENT_OPERATOR); //done
                     put("~", PerlTokens.STRING_CONCATENATION_OPERATOR);
-                    put(":=", PerlTokens.BINDING_OPERATOR);
-                    put("x", PerlTokens.STRING_REPLICATION_OPERATOR);
-                    put("~~", PerlTokens.SMART_MATCH_OPERATOR);
                     put("++", PerlTokens.INCREMENT_OPERATOR);//done
                     put("--", PerlTokens.DECREMENT_OPERATOR);//done
                     put("<", PerlTokens.LEFT_ANG_BRACKET); //done
@@ -172,6 +169,9 @@ class Token {
                     put("return", PerlTokens.RETURN_OPERATOR);//done
                     put("returns", PerlTokens.RETURN_OPERATOR);//done
                     put("-->", PerlTokens.RETURN_OPERATOR);//done
+                    put(":=", PerlTokens.BINDING_OPERATOR);
+                    put("x", PerlTokens.STRING_REPLICATION_OPERATOR);
+                    put("~~", PerlTokens.SMART_MATCH_OPERATOR);
                     put("sub", PerlTokens.SUB_KEYWORD);//done
                     put("unless", PerlTokens.UNLESS_KEYWORD);//done
                     put("until", PerlTokens.UNTIL_KEYWORD);//done
